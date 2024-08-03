@@ -18,15 +18,13 @@ public class LoginServiceImpl implements LoginService {
     private AuthenticationManager authenticationManager;
 
     @Override
-    public AjaxResult getToken(String username, String password) {
+    public String getToken(String username, String password) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
 
         Authentication authenticate = authenticationManager.authenticate(authenticationToken); // 登录失败会自动处理
         UserDetailsImpl loginUser = (UserDetailsImpl) authenticate.getPrincipal();
         User user = loginUser.getUser();
 
-        String jwt = JwtUtil.createJWT(user.getId().toString());
-
-        return AjaxResult.successProjectInfoData(200, "login success", jwt);
+        return JwtUtil.createJWT(user.getId().toString());
     }
 }

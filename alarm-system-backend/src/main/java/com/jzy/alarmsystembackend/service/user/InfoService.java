@@ -5,5 +5,6 @@ import com.jzy.alarmsystembackend.pojo.VO.AjaxResult;
 import java.util.Map;
 
 public interface InfoService {
-    public AjaxResult getInfo();
+    Map<String, String> getInfo();
+    Integer updateFirm(Integer firmId);
 }

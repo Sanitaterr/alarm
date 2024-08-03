@@ -61,7 +61,7 @@ public class RegisterServiceImpl implements RegisterService {
 
         String encodedPassword = passwordEncoder.encode(password);
         String photo = "https://profile-avatar.csdnimg.cn/1dd662a7799a42f0a187eb69e74d73a3_weixin_52971316.jpg!1";
-        User user = new User(null, username, encodedPassword, photo);
+        User user = new User(null, username, encodedPassword, photo, null);
         userMapper.insert(user);
 
         return AjaxResult.success("register success");

@@ -5,5 +5,5 @@ import com.jzy.alarmsystembackend.pojo.VO.AjaxResult;
 import java.util.Map;
 
 public interface LoginService {
-    public AjaxResult getToken(String username, String password);
+    public String getToken(String username, String password);
 }

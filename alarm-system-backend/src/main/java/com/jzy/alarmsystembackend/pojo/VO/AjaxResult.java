@@ -1,5 +1,10 @@
 package com.jzy.alarmsystembackend.pojo.VO;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 import java.util.HashMap;
 
 /**
@@ -8,14 +13,18 @@ import java.util.HashMap;
  * @author jzy
  *
  */
-public class AjaxResult extends HashMap<String, Object>
-{
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class AjaxResult<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 初始化一个新创建的 Message 对象
-     */
-    public AjaxResult() {}
+    public static final int ERROR_WITH_NO_MESSAGE = 1;
+    public static final int ERROR_WITH_MSG = 500;
+    public static final int SUCCESS = 200;
+    private int code;
+    private String msg;
+    private T data;
 
     /**
      * 返回错误消息
@@ -24,7 +33,7 @@ public class AjaxResult extends HashMap<String, Object>
      */
     public static AjaxResult error()
     {
-        return error(1, "操作失败");
+        return error(ERROR_WITH_NO_MESSAGE, "操作失败");
     }
 
     /**
@@ -35,7 +44,7 @@ public class AjaxResult extends HashMap<String, Object>
      */
     public static AjaxResult error(String msg)
     {
-        return error(500, msg);
+        return error(ERROR_WITH_MSG, msg);
     }
 
     /**
@@ -47,10 +56,7 @@ public class AjaxResult extends HashMap<String, Object>
      */
     public static AjaxResult error(int code, String msg)
     {
-        AjaxResult json = new AjaxResult();
-        json.put("code", code);
-        json.put("msg", msg);
-        return json;
+        return new AjaxResult(code,msg,null);
     }
 
     /**
@@ -61,10 +67,7 @@ public class AjaxResult extends HashMap<String, Object>
      */
     public static AjaxResult success(String msg)
     {
-        AjaxResult json = new AjaxResult();
-        json.put("code", 200);
-        json.put("msg", msg);
-        return json;
+        return new AjaxResult(SUCCESS,msg,null);
     }
 
     /**
@@ -77,57 +80,18 @@ public class AjaxResult extends HashMap<String, Object>
         return AjaxResult.success("操作成功");
     }
 
-    public static AjaxResult successData(int code, Object value){
-        AjaxResult json = new AjaxResult();
-        json.put("code", code);
-        json.put("data", value);
-        return json;
+    public static AjaxResult successData(Object value){
+        return new AjaxResult(SUCCESS,null,value);
     }
-
-    /**
-     * 返回新增立项申报后的信息
-     * @param code
-     * @param msg
-     * @param id
-     * @return
-     */
-    public static AjaxResult successProjectData(int code, String msg, String id,String pId){
-        AjaxResult json = new AjaxResult();
-        json.put("code", code);
-        json.put("msg", msg);
-        json.put("id", id);
-        json.put("pId",pId);
-        return json;
-    }
-
-
 
     /**
      * 返回项目基本信息
-     * @param code
      * @param msg
      * @param data
      * @return
      */
-    public static AjaxResult successProjectInfoData(int code, String msg, Object data){
-        AjaxResult json = new AjaxResult();
-        json.put("code", code);
-        json.put("msg", msg);
-        json.put("data", data);
-        return json;
+    public static AjaxResult successProjectInfoData(String msg, Object data){
+        return new AjaxResult(200, msg, data);
     }
 
-    /**
-     * 返回成功消息
-     *
-     * @param key 键值
-     * @param value 内容
-     * @return 成功消息
-     */
-    @Override
-    public AjaxResult put(String key, Object value)
-    {
-        super.put(key, value);
-        return this;
-    }
 }

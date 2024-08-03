@@ -52,9 +52,13 @@ public class Alarm {
     /**
      * 报警恢复状态
      */
-    private Bool recoverStatus;
+    private Boolean recoverStatus;
     /**
      * 与报警相关的其他信息
      */
     private String additionalInfo;
+    /**
+     * 所属公司id
+     */
+    private Integer firmId;
 }
