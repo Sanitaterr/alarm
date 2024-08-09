@@ -1,6 +1,6 @@
 package com.jzy.alarmsystembackend.controller.firm;
 
-import com.jzy.alarmsystembackend.pojo.DO.Alarm;
+import com.jzy.alarmsystembackend.pojo.DO.AlarmParticulars;
 import com.jzy.alarmsystembackend.pojo.VO.AjaxResult;
 import com.jzy.alarmsystembackend.pojo.VO.firm.FirmParamVO1;
 import com.jzy.alarmsystembackend.service.firm.FirmService;
@@ -26,7 +26,7 @@ public class FirmController {
 
     @PostMapping("/selectAlarmByFirmId")
     public AjaxResult selectAlarmByFirmId(@RequestBody FirmParamVO1 param) {
-        List<Alarm> alarms = firmService.selectAlarmByFirmId(param.getFirmId());
+        List<AlarmParticulars> alarms = firmService.selectAlarmByFirmId(param.getFirmId());
         return AjaxResult.successProjectInfoData("select alarm by firmId success", alarms);
     }
 }

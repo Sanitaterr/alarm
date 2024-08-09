@@ -1,10 +1,8 @@
 package com.jzy.alarmsystembackend.config;
 
-import cn.hutool.json.JSON;
 import cn.hutool.json.JSONUtil;
-import cn.hutool.json.ObjectMapper;
-import com.jzy.alarmsystembackend.mapper.AlarmMapper;
-import com.jzy.alarmsystembackend.pojo.DO.Alarm;
+import com.jzy.alarmsystembackend.mapper.alarm.AlarmParticularsMapper;
+import com.jzy.alarmsystembackend.pojo.DO.AlarmParticulars;
 import com.jzy.alarmsystembackend.pojo.VO.mqtt.MqttParamVO1;
 import com.jzy.alarmsystembackend.service.alarm.AlarmService;
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +59,7 @@ public class MqttConfig {
     private AlarmService alarmService;
 
     @Autowired
-    private AlarmMapper alarmMapper;
+    private AlarmParticularsMapper alarmParticularsMapper;
 
     @Bean
     @ServiceActivator(inputChannel = "mqttInputChannel")
@@ -71,12 +69,12 @@ public class MqttConfig {
             String payload = message.getPayload().toString();
             System.out.println("Received message: " + payload + " from topic: " + topic);
             MqttParamVO1 param = JSONUtil.toBean(payload, MqttParamVO1.class);
-            Alarm alarm = alarmService.selectAlarmById(param.getId());
-            if (alarm != null) {
-                Alarm alarm1 = new Alarm(null, alarm.getSource(), param.getType(), param.getLevel(), param.getOccurTime(), null, null, false, false, null, param.getFirmId());
-                int i = alarmMapper.insert(alarm1);
+            AlarmParticulars alarmParticulars = alarmService.selectAlarmById(param.getId());
+            if (alarmParticulars != null) {
+                AlarmParticulars alarmParticulars1 = new AlarmParticulars(null, alarmParticulars.getAlarmId(), alarmParticulars.getSource(), param.getType(), param.getLevel(), param.getOccurTime(), null, null, false, false, null);
+                int i = alarmParticularsMapper.insert(alarmParticulars1);
                 if (i > 0) {
-                    log.info("new log: " + alarm1);
+                    log.info("new log: " + alarmParticulars1);
                 } else {
                     log.error("insert failed!!!!!");
                 }

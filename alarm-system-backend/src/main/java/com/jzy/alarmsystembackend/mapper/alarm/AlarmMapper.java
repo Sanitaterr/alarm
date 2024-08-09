@@ -1,4 +1,4 @@
-package com.jzy.alarmsystembackend.mapper;
+package com.jzy.alarmsystembackend.mapper.alarm;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jzy.alarmsystembackend.pojo.DO.Alarm;

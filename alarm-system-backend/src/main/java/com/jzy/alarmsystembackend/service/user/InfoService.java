@@ -7,4 +7,5 @@ import java.util.Map;
 public interface InfoService {
     Map<String, String> getInfo();
     Integer updateFirm(Integer firmId);
+    Integer getFirmId();
 }

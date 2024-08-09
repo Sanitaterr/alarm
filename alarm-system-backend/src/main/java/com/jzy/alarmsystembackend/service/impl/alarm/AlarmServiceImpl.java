@@ -1,44 +1,57 @@
 package com.jzy.alarmsystembackend.service.impl.alarm;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.jzy.alarmsystembackend.mapper.AlarmMapper;
+import com.jzy.alarmsystembackend.mapper.alarm.AlarmParticularsMapper;
 import com.jzy.alarmsystembackend.pojo.DO.Alarm;
-import com.jzy.alarmsystembackend.pojo.VO.AjaxResult;
+import com.jzy.alarmsystembackend.pojo.DO.AlarmParticulars;
 import com.jzy.alarmsystembackend.service.alarm.AlarmService;
+import com.jzy.alarmsystembackend.service.user.InfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.function.Predicate;
 
 @Service
 public class AlarmServiceImpl implements AlarmService {
 
     @Autowired
-    private AlarmMapper alarmMapper;
+    private AlarmParticularsMapper alarmParticularsMapper;
+
+    @Autowired
+    private InfoService infoService;
 
     /**
      * 查询所有报警
      * @return List<Alarm>
      */
     @Override
-    public List<Alarm> selectAllAlarm() {
-        return alarmMapper.selectList(null);
+    public List<AlarmParticulars> selectAllAlarm() {
+        return alarmParticularsMapper.selectList(null);
     }
 
     /**
-     * 根据id查询所有报警
+     * 查询所有报警
+     * By firmId
+     * @return List<Alarm>
+     */
+    @Override
+    public List<AlarmParticulars> selectAllAlarmAuth() {
+        Integer firmId = infoService.getFirmId();
+        return alarmParticularsMapper.selectAlarmParticularsAuth(firmId);
+
+    }
+
+    /**
+     * 根据id查询报警
      * @param id id
      * @return Alarm
      */
     @Override
-    public Alarm selectAlarmById(Integer id) {
-        return alarmMapper.selectById(id);
+    public AlarmParticulars selectAlarmById(Integer id) {
+        return alarmParticularsMapper.selectById(id);
     }
 
     /**
@@ -48,12 +61,12 @@ public class AlarmServiceImpl implements AlarmService {
      * @return Alarm
      */
     @Override
-    public Alarm selectAlarmBySourceAndOccurTime(String source, Timestamp occurTime) {
-        LambdaQueryWrapper<Alarm> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    public AlarmParticulars selectAlarmBySourceAndOccurTime(String source, Timestamp occurTime) {
+        LambdaQueryWrapper<AlarmParticulars> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper
-                .eq(Alarm::getSource, source)
-                .eq(Alarm::getOccurTime, occurTime);
-        return alarmMapper.selectOne(lambdaQueryWrapper);
+                .eq(AlarmParticulars::getSource, source)
+                .eq(AlarmParticulars::getOccurTime, occurTime);
+        return alarmParticularsMapper.selectOne(lambdaQueryWrapper);
     }
 
     /**
@@ -61,14 +74,31 @@ public class AlarmServiceImpl implements AlarmService {
      * @return List<Alarm>
      */
     @Override
-    public List<Alarm> selectAllHistoricalAlarmOrderedByOccurTime() {
-        LambdaQueryWrapper<Alarm> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    public List<AlarmParticulars> selectAllHistoricalAlarmOrderedByOccurTime() {
+        LambdaQueryWrapper<AlarmParticulars> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper
-                .eq(Alarm::getConfirmStatus, true)
-                .eq(Alarm::getRecoverStatus, true)
-                .orderByDesc(Alarm::getOccurTime)
+                .eq(AlarmParticulars::getConfirmStatus, true)
+                .eq(AlarmParticulars::getRecoverStatus, true)
+                .orderByDesc(AlarmParticulars::getOccurTime)
                 .last("LIMIT 30");
-        return alarmMapper.selectList(lambdaQueryWrapper);
+        return alarmParticularsMapper.selectList(lambdaQueryWrapper);
+    }
+
+    /**
+     * 查询所有 历史 报警，获取最近的 30 条报警，然后按时间 倒序 排列显示
+     * By firmId
+     * @return List<Alarm>
+     */
+    @Override
+    public List<AlarmParticulars> selectAllHistoricalAlarmOrderedByOccurTimeAuth() {
+        LambdaQueryWrapper<AlarmParticulars> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper
+                .apply("firm_id = " + infoService.getFirmId())
+                .eq(AlarmParticulars::getConfirmStatus, true)
+                .eq(AlarmParticulars::getRecoverStatus, true)
+                .orderByDesc(AlarmParticulars::getOccurTime)
+                .last("LIMIT 30");
+        return alarmParticularsMapper.selectAlarmParticularsByWrapperAuth(lambdaQueryWrapper);
     }
 
     /**
@@ -76,14 +106,33 @@ public class AlarmServiceImpl implements AlarmService {
      * @return List<Alarm>
      */
     @Override
-    public List<Alarm> selectAllRealtimeAlarmOrderedByOccurTime() {
-        LambdaQueryWrapper<Alarm> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    public List<AlarmParticulars> selectAllRealtimeAlarmOrderedByOccurTime() {
+        LambdaQueryWrapper<AlarmParticulars> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper
-                .ne(Alarm::getConfirmStatus, true)
-                .or(wrapper -> wrapper.ne(Alarm::getRecoverStatus, true))
-                .orderByDesc(Alarm::getOccurTime)
+                .ne(AlarmParticulars::getConfirmStatus, true)
+                .or(wrapper -> wrapper.ne(AlarmParticulars::getRecoverStatus, true))
+                .orderByDesc(AlarmParticulars::getOccurTime)
                 .last("LIMIT 30");
-        return alarmMapper.selectList(lambdaQueryWrapper);
+        return alarmParticularsMapper.selectList(lambdaQueryWrapper);
+    }
+
+    /**
+     * 查询所有 实时 报警，获取最近的 30 条报警，然后按时间 倒序 排列显示
+     * By firmId
+     * @return List<Alarm>
+     */
+    @Override
+    public List<AlarmParticulars> selectAllRealtimeAlarmOrderedByOccurTimeAuth() {
+        LambdaQueryWrapper<AlarmParticulars> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper
+                .apply("firm_id = " + infoService.getFirmId())
+                .and(wrapper -> wrapper
+                        .ne(AlarmParticulars::getConfirmStatus, true)
+                        .or(wrapper1 -> wrapper1
+                                .ne(AlarmParticulars::getRecoverStatus, true)))
+                .orderByDesc(AlarmParticulars::getOccurTime)
+                .last("LIMIT 30");
+        return alarmParticularsMapper.selectAlarmParticularsByWrapperAuth(lambdaQueryWrapper);
     }
 
     /**
@@ -92,15 +141,15 @@ public class AlarmServiceImpl implements AlarmService {
      * @return List<Alarm>
      */
     @Override
-    public IPage<Alarm> selectAllHistoricalAlarmOrderedByOccurTimePaged(Long pageNum, Long pageSize) {
-        LambdaQueryWrapper<Alarm> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    public IPage<AlarmParticulars> selectAllHistoricalAlarmOrderedByOccurTimePaged(Long pageNum, Long pageSize) {
+        LambdaQueryWrapper<AlarmParticulars> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper
-                .eq(Alarm::getConfirmStatus, true)
-                .eq(Alarm::getRecoverStatus, true)
-                .orderByDesc(Alarm::getOccurTime);
+                .eq(AlarmParticulars::getConfirmStatus, true)
+                .eq(AlarmParticulars::getRecoverStatus, true)
+                .orderByDesc(AlarmParticulars::getOccurTime);
 
-        Page<Alarm> page = new Page<>(pageNum, pageSize);
-        return alarmMapper.selectPage(page, lambdaQueryWrapper);
+        Page<AlarmParticulars> page = new Page<>(pageNum, pageSize);
+        return alarmParticularsMapper.selectPage(page, lambdaQueryWrapper);
     }
 
     /**
@@ -109,14 +158,14 @@ public class AlarmServiceImpl implements AlarmService {
      * @return List<Alarm>
      */
     @Override
-    public IPage<Alarm> selectAllRealtimeAlarmOrderedByOccurTimePaged(Long pageNum, Long pageSize) {
-        LambdaQueryWrapper<Alarm> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    public IPage<AlarmParticulars> selectAllRealtimeAlarmOrderedByOccurTimePaged(Long pageNum, Long pageSize) {
+        LambdaQueryWrapper<AlarmParticulars> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper
-                .ne(Alarm::getConfirmStatus, true)
-                .or(wrapper -> wrapper.ne(Alarm::getRecoverStatus, true))
-                .orderByDesc(Alarm::getOccurTime);
-        Page<Alarm> page = new Page<>(pageNum, pageSize);
-        return alarmMapper.selectPage(page, lambdaQueryWrapper);
+                .ne(AlarmParticulars::getConfirmStatus, true)
+                .or(wrapper -> wrapper.ne(AlarmParticulars::getRecoverStatus, true))
+                .orderByDesc(AlarmParticulars::getOccurTime);
+        Page<AlarmParticulars> page = new Page<>(pageNum, pageSize);
+        return alarmParticularsMapper.selectPage(page, lambdaQueryWrapper);
     }
 
     /**
@@ -124,17 +173,17 @@ public class AlarmServiceImpl implements AlarmService {
      * @return List<Alarm>
      */
     @Override
-    public List<Alarm> selectRealtimeAlarmOrdered() {
-        LambdaQueryWrapper<Alarm> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    public List<AlarmParticulars> selectRealtimeAlarmOrdered() {
+        LambdaQueryWrapper<AlarmParticulars> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper
-                .ne(Alarm::getConfirmStatus, true)
-                .or(wrapper -> wrapper.ne(Alarm::getRecoverStatus, true))
-                .orderByAsc(Alarm::getConfirmStatus)
-                .orderByAsc(Alarm::getRecoverStatus)
-                .orderByDesc(Alarm::getLevel)
-                .orderByDesc(Alarm::getOccurTime)
+                .ne(AlarmParticulars::getConfirmStatus, true)
+                .or(wrapper -> wrapper.ne(AlarmParticulars::getRecoverStatus, true))
+                .orderByAsc(AlarmParticulars::getConfirmStatus)
+                .orderByAsc(AlarmParticulars::getRecoverStatus)
+                .orderByDesc(AlarmParticulars::getLevel)
+                .orderByDesc(AlarmParticulars::getOccurTime)
                 .last("LIMIT 10");
-        return alarmMapper.selectList(lambdaQueryWrapper);
+        return alarmParticularsMapper.selectList(lambdaQueryWrapper);
     }
 
 }

@@ -1,4 +1,4 @@
-package com.jzy.alarmsystembackend.pojo.VO.alarm;
+package com.jzy.alarmsystembackend.pojo.VO.alarm.particulars;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -10,7 +10,7 @@ import java.sql.Timestamp;
  * source, occurTime
  */
 @Data
-public class AlarmParamVO2 implements Serializable {
+public class AlarmParticularsParamVO2 implements Serializable {
 
     private static final long serialVersionUID = -520270777176062835L;
     private String source;

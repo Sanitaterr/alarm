@@ -1,13 +1,11 @@
-package com.jzy.alarmsystembackend.controller.alarm;
+package com.jzy.alarmsystembackend.controller.alarm.particulars;
 
 import com.jzy.alarmsystembackend.pojo.VO.AjaxResult;
-import com.jzy.alarmsystembackend.pojo.VO.alarm.AlarmParamVO1;
-import com.jzy.alarmsystembackend.pojo.VO.alarm.AlarmParamVO2;
-import com.jzy.alarmsystembackend.pojo.VO.alarm.AlarmParamVO3;
+import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO1;
+import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO2;
+import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO3;
 import com.jzy.alarmsystembackend.service.alarm.AlarmService;
-import com.jzy.alarmsystembackend.util.RedisCache;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/alarm")
-public class AlarmController {
+public class AlarmParticularsController {
 
     @Autowired
     private AlarmService alarmService;
@@ -36,7 +34,7 @@ public class AlarmController {
     public AjaxResult selectAllAlarm() {
         return AjaxResult.successProjectInfoData(
                 "select all alarm success",
-                alarmService.selectAllAlarm());
+                alarmService.selectAllAlarmAuth());
     }
 
     /**
@@ -45,7 +43,7 @@ public class AlarmController {
      * @return AjaxResult
      */
     @PostMapping("/selectAlarmById")
-    public AjaxResult selectAlarmById(@RequestBody AlarmParamVO1 param) {
+    public AjaxResult selectAlarmById(@RequestBody AlarmParticularsParamVO1 param) {
         return AjaxResult.successProjectInfoData(
                 String.format("select alarm by id: '%d' success", param.getId()),
                 alarmService.selectAlarmById(param.getId()));
@@ -57,7 +55,7 @@ public class AlarmController {
      * @return AjaxResult
      */
     @PostMapping("/selectAlarmBySourceAndOccurTime")
-    public AjaxResult selectAlarmBySourceAndOccurTime(@RequestBody AlarmParamVO2 param) {
+    public AjaxResult selectAlarmBySourceAndOccurTime(@RequestBody AlarmParticularsParamVO2 param) {
         System.out.println(param.getOccurTime());
         return AjaxResult.successProjectInfoData(
                 String.format("select alarm by source: '%s' and occur_time: '%s' success", param.getSource(), param.getOccurTime()),
@@ -72,7 +70,7 @@ public class AlarmController {
     public AjaxResult selectAllHistoricalAlarmOrderedByOccurTime() {
         return AjaxResult.successProjectInfoData(
                 "select all historical alarm ordered by occurTime success",
-                alarmService.selectAllHistoricalAlarmOrderedByOccurTime());
+                alarmService.selectAllHistoricalAlarmOrderedByOccurTimeAuth());
     }
 
     /**
@@ -83,7 +81,7 @@ public class AlarmController {
     public AjaxResult selectAllRealtimeAlarmOrderedByOccurTime() {
         return AjaxResult.successProjectInfoData(
                 "select all realtime alarm ordered by occurTime success",
-                alarmService.selectAllRealtimeAlarmOrderedByOccurTime());
+                alarmService.selectAllRealtimeAlarmOrderedByOccurTimeAuth());
     }
 
     /**
@@ -92,7 +90,7 @@ public class AlarmController {
      * @return AjaxResult
      */
     @PostMapping("/selectAllHistoricalAlarmOrderedByOccurTimePaged")
-    public AjaxResult selectAllHistoricalAlarmOrderedByOccurTimePaged(@RequestBody AlarmParamVO3 param) {
+    public AjaxResult selectAllHistoricalAlarmOrderedByOccurTimePaged(@RequestBody AlarmParticularsParamVO3 param) {
         log.info(param.getPageNum() + " " + param.getPageSize());
         return AjaxResult.successProjectInfoData(
                 "select all historical alarm ordered by occurTime aged success",
@@ -105,7 +103,7 @@ public class AlarmController {
      * @return AjaxResult
      */
     @PostMapping("/selectAllRealtimeAlarmOrderedByOccurTimePaged")
-    public AjaxResult selectAllRealtimeAlarmOrderedByOccurTimePaged(@RequestBody AlarmParamVO3 param) {
+    public AjaxResult selectAllRealtimeAlarmOrderedByOccurTimePaged(@RequestBody AlarmParticularsParamVO3 param) {
         return AjaxResult.successProjectInfoData(
                 "select all realtime alarm ordered by occurTime paged success",
                 alarmService.selectAllRealtimeAlarmOrderedByOccurTimePaged(param.getPageNum(), param.getPageSize()));
