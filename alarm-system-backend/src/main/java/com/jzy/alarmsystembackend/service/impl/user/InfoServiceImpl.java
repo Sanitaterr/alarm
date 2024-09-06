@@ -3,7 +3,6 @@ package com.jzy.alarmsystembackend.service.impl.user;
 import com.jzy.alarmsystembackend.mapper.UserMapper;
 import com.jzy.alarmsystembackend.pojo.DO.User;
 import com.jzy.alarmsystembackend.pojo.DTO.UserDetailsImpl;
-import com.jzy.alarmsystembackend.pojo.VO.AjaxResult;
 import com.jzy.alarmsystembackend.service.user.InfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,25 +19,15 @@ public class InfoServiceImpl implements InfoService {
     private UserMapper userMapper;
 
     @Override
-    public Map<String, String> getInfo() {
-        UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-
-        UserDetailsImpl loginUser = (UserDetailsImpl) authentication.getPrincipal();
-        User user = loginUser.getUser();
-
-        Map<String, String> map = new HashMap<>();
-        map.put("id", user.getId().toString());
-        map.put("username", user.getUsername());
-        map.put("photo", user.getPhoto());
-        map.put("firmId", user.getFirmId().toString());
-        return map;
+    public User getInfo() {
+        UserDetailsImpl loginUser = getUserDetailsFromAuth();
+        return loginUser.getUser();
     }
+
 
     @Override
     public Integer updateFirm(Integer firmId) {
-        UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-
-        UserDetailsImpl loginUser = (UserDetailsImpl) authentication.getPrincipal();
+        UserDetailsImpl loginUser = getUserDetailsFromAuth();
         User user = loginUser.getUser();
 
         user.setFirmId(firmId);
@@ -46,12 +35,12 @@ public class InfoServiceImpl implements InfoService {
         return userMapper.updateById(user);
     }
 
-    @Override
-    public Integer getFirmId() {
+
+    private static UserDetailsImpl getUserDetailsFromAuth() {
         UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         UserDetailsImpl loginUser = (UserDetailsImpl) authentication.getPrincipal();
-        User user = loginUser.getUser();
-        return user.getFirmId();
+        return loginUser;
     }
+
 }

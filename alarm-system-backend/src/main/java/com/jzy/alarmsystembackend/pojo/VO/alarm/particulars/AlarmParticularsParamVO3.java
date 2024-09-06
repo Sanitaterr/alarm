@@ -5,7 +5,8 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * pageNum pageSize
+ * pageNum<br>
+ * pageSize
  */
 @Data
 public class AlarmParticularsParamVO3 implements Serializable {

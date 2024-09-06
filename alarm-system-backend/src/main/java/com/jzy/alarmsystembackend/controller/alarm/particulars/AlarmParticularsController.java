@@ -4,7 +4,7 @@ import com.jzy.alarmsystembackend.pojo.VO.AjaxResult;
 import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO1;
 import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO2;
 import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO3;
-import com.jzy.alarmsystembackend.service.alarm.AlarmService;
+import com.jzy.alarmsystembackend.service.alarm.particulars.AlarmParticularsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AlarmParticularsController {
 
     @Autowired
-    private AlarmService alarmService;
+    private AlarmParticularsService alarmParticularsService;
 
 
     @PostMapping("/test")
@@ -34,7 +34,19 @@ public class AlarmParticularsController {
     public AjaxResult selectAllAlarm() {
         return AjaxResult.successProjectInfoData(
                 "select all alarm success",
-                alarmService.selectAllAlarmAuth());
+                alarmParticularsService.selectAllAlarmAuth());
+    }
+
+    /**
+     * 查询所有报警
+     * 带分页
+     * @return AjaxResult
+     */
+    @PostMapping("/selectAllAlarmPaged")
+    public AjaxResult selectAllAlarm(@RequestBody AlarmParticularsParamVO3 param) {
+        return AjaxResult.successProjectInfoData(
+                "select all alarm paged success",
+                alarmParticularsService.selectAllAlarmPagedAuth(param.getPageNum(), param.getPageSize()));
     }
 
     /**
@@ -45,8 +57,8 @@ public class AlarmParticularsController {
     @PostMapping("/selectAlarmById")
     public AjaxResult selectAlarmById(@RequestBody AlarmParticularsParamVO1 param) {
         return AjaxResult.successProjectInfoData(
-                String.format("select alarm by id: '%d' success", param.getId()),
-                alarmService.selectAlarmById(param.getId()));
+                "select alarm by id success",
+                alarmParticularsService.selectAlarmById(param.getId()));
     }
 
     /**
@@ -58,8 +70,8 @@ public class AlarmParticularsController {
     public AjaxResult selectAlarmBySourceAndOccurTime(@RequestBody AlarmParticularsParamVO2 param) {
         System.out.println(param.getOccurTime());
         return AjaxResult.successProjectInfoData(
-                String.format("select alarm by source: '%s' and occur_time: '%s' success", param.getSource(), param.getOccurTime()),
-                alarmService.selectAlarmBySourceAndOccurTime(param.getSource(), param.getOccurTime()));
+                "select alarm by source and occur_time success",
+                alarmParticularsService.selectAlarmBySourceAndOccurTime(param.getSource(), param.getOccurTime()));
     }
 
     /**
@@ -70,7 +82,7 @@ public class AlarmParticularsController {
     public AjaxResult selectAllHistoricalAlarmOrderedByOccurTime() {
         return AjaxResult.successProjectInfoData(
                 "select all historical alarm ordered by occurTime success",
-                alarmService.selectAllHistoricalAlarmOrderedByOccurTimeAuth());
+                alarmParticularsService.selectAllHistoricalAlarmOrderedByOccurTimeAuth());
     }
 
     /**
@@ -81,7 +93,7 @@ public class AlarmParticularsController {
     public AjaxResult selectAllRealtimeAlarmOrderedByOccurTime() {
         return AjaxResult.successProjectInfoData(
                 "select all realtime alarm ordered by occurTime success",
-                alarmService.selectAllRealtimeAlarmOrderedByOccurTimeAuth());
+                alarmParticularsService.selectAllRealtimeAlarmOrderedByOccurTimeAuth());
     }
 
     /**
@@ -94,7 +106,7 @@ public class AlarmParticularsController {
         log.info(param.getPageNum() + " " + param.getPageSize());
         return AjaxResult.successProjectInfoData(
                 "select all historical alarm ordered by occurTime aged success",
-                alarmService.selectAllHistoricalAlarmOrderedByOccurTimePaged(param.getPageNum(), param.getPageSize()));
+                alarmParticularsService.selectAllHistoricalAlarmOrderedByOccurTimePagedAuth(param.getPageNum(), param.getPageSize()));
     }
 
     /**
@@ -106,7 +118,7 @@ public class AlarmParticularsController {
     public AjaxResult selectAllRealtimeAlarmOrderedByOccurTimePaged(@RequestBody AlarmParticularsParamVO3 param) {
         return AjaxResult.successProjectInfoData(
                 "select all realtime alarm ordered by occurTime paged success",
-                alarmService.selectAllRealtimeAlarmOrderedByOccurTimePaged(param.getPageNum(), param.getPageSize()));
+                alarmParticularsService.selectAllRealtimeAlarmOrderedByOccurTimePagedAuth(param.getPageNum(), param.getPageSize()));
     }
 
     /**
@@ -117,7 +129,7 @@ public class AlarmParticularsController {
     public AjaxResult selectRealtimeAlarmOrdered() {
         return AjaxResult.successProjectInfoData(
                 "select realtime alarm ordered success",
-                alarmService.selectRealtimeAlarmOrdered()
+                alarmParticularsService.selectRealtimeAlarmOrderedAuth()
         );
     }
 }

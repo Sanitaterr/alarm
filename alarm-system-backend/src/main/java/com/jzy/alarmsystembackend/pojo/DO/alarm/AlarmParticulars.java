@@ -1,4 +1,4 @@
-package com.jzy.alarmsystembackend.pojo.DO;
+package com.jzy.alarmsystembackend.pojo.DO.alarm;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -37,7 +37,7 @@ public class AlarmParticulars {
      */
     private Integer level;
     /**
-     * 报警发生事件
+     * 报警发生时间
      */
     private Timestamp occurTime;
     /**

@@ -2,20 +2,80 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jzy.alarmsystembackend.mapper.alarm.AlarmParticularsMapper">
     <select id="selectAlarmParticularsAuth"
-            resultType="com.jzy.alarmsystembackend.pojo.DO.AlarmParticulars">
+            resultType="com.jzy.alarmsystembackend.pojo.DO.alarm.AlarmParticulars">
         SELECT * FROM alarm_particulars JOIN alarm.alarm ON alarm_particulars.alarm_id = alarm.id
         WHERE firm_id = #{firmId}
     </select>
 
     <select id="selectAlarmParticularsByIdAuth"
-            resultType="com.jzy.alarmsystembackend.pojo.DO.AlarmParticulars">
+            resultType="com.jzy.alarmsystembackend.pojo.DO.alarm.AlarmParticulars">
         SELECT * FROM alarm_particulars JOIN alarm.alarm ON alarm_particulars.alarm_id = alarm.id
         WHERE alarm.id = #{id}
     </select>
 
     <select id="selectAlarmParticularsByWrapperAuth"
-            resultType="com.jzy.alarmsystembackend.pojo.DO.AlarmParticulars">
+            resultType="com.jzy.alarmsystembackend.pojo.DO.alarm.AlarmParticulars">
         SELECT * FROM alarm_particulars JOIN alarm.alarm ON alarm_particulars.alarm_id = alarm.id
+        ${ew.customSqlSegment}
+    </select>
+
+    <select id="selectAlarmParticularsByWrapperPagedAuth"
+            resultType="com.jzy.alarmsystembackend.pojo.DO.alarm.AlarmParticulars">
+        SELECT * FROM alarm_particulars JOIN alarm.alarm ON alarm_particulars.alarm_id = alarm.id
+        ${ew.customSqlSegment}
+    </select>
+
+    <select id="selectAlarmNumsByTimeAuth" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+        <choose>
+            <when test="timeType == 'year'">
+                MONTH(occur_time) AS timeUnit, COUNT(*) AS count
+                FROM alarm_particulars JOIN alarm.alarm ON alarm_particulars.alarm_id = alarm.id
+                <choose>
+                    <when test="ew != null and ew.customSqlSegment != null">
+                        ${ew.customSqlSegment} AND YEAR(occur_time) = YEAR(CURRENT_DATE)
+                    </when>
+                    <otherwise>
+                        WHERE YEAR(occur_time) = YEAR(CURRENT_DATE)
+                    </otherwise>
+                </choose>
+                GROUP BY MONTH(occur_time)
+            </when>
+            <when test="timeType == 'month'">
+                WEEK(occur_time) AS timeUnit, COUNT(*) AS count
+                FROM alarm_particulars JOIN alarm.alarm ON alarm_particulars.alarm_id = alarm.id
+                <choose>
+                    <when test="ew != null and ew.customSqlSegment != null">
+                        ${ew.customSqlSegment} AND MONTH(occur_time) = MONTH(CURRENT_DATE)
+                    </when>
+                    <otherwise>
+                        WHERE MONTH(occur_time) = MONTH(CURRENT_DATE)
+                    </otherwise>
+                </choose>
+                GROUP BY WEEK(occur_time)
+            </when>
+            <when test="timeType == 'week'">
+                DAYOFWEEK(occur_time) AS timeUnit, COUNT(*) AS count
+                FROM alarm_particulars JOIN alarm.alarm ON alarm_particulars.alarm_id = alarm.id
+                <choose>
+                    <when test="ew != null and ew.customSqlSegment != null">
+                        ${ew.customSqlSegment} AND WEEK(occur_time) = WEEK(CURRENT_DATE)
+                    </when>
+                    <otherwise>
+                        WHERE WEEK(occur_time) = WEEK(CURRENT_DATE)
+                    </otherwise>
+                </choose>
+                GROUP BY DAYOFWEEK(occur_time)
+            </when>
+            <otherwise>
+                1 AS timeUnit, 0 AS count
+                FROM DUAL
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="selectAlarmNumsByWrapperAuth" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM alarm_particulars JOIN alarm.alarm ON alarm_particulars.alarm_id = alarm.id
         ${ew.customSqlSegment}
     </select>
 </mapper>

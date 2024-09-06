@@ -1,7 +1,7 @@
 package com.jzy.alarmsystembackend;
 
 import com.jzy.alarmsystembackend.mapper.alarm.AlarmParticularsMapper;
-import com.jzy.alarmsystembackend.pojo.DO.AlarmParticulars;
+import com.jzy.alarmsystembackend.pojo.DO.alarm.AlarmParticulars;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,5 +1,7 @@
 package com.jzy.alarmsystembackend.controller.user;
 
+import com.jzy.alarmsystembackend.annotations.Loggable;
+import com.jzy.alarmsystembackend.controller.log.user.LoginLogImpl;
 import com.jzy.alarmsystembackend.pojo.VO.AjaxResult;
 import com.jzy.alarmsystembackend.pojo.VO.user.UserParamVO1;
 import com.jzy.alarmsystembackend.service.user.LoginService;
@@ -15,6 +17,8 @@ public class LoginController {
     @Autowired
     private LoginService loginService;
 
+
+    @Loggable(LoginLogImpl.class)
     @PostMapping("/user/login")
     public AjaxResult getToken(@RequestBody UserParamVO1 param) {
         return AjaxResult.successProjectInfoData("login success", loginService.getToken(param.getUsername(), param.getPassword()));

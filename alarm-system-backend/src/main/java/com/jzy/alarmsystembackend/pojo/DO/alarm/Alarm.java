@@ -1,4 +1,4 @@
-package com.jzy.alarmsystembackend.pojo.DO;
+package com.jzy.alarmsystembackend.pojo.DO.alarm;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

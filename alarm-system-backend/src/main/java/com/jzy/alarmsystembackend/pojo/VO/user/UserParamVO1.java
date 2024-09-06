@@ -4,6 +4,10 @@ import lombok.Data;
 
 import java.io.Serializable;
 
+/**
+ * username<br>
+ * password
+ */
 @Data
 public class UserParamVO1 implements Serializable {
 

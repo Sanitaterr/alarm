@@ -1,6 +1,6 @@
 package com.jzy.alarmsystembackend.controller.firm;
 
-import com.jzy.alarmsystembackend.pojo.DO.AlarmParticulars;
+import com.jzy.alarmsystembackend.pojo.DO.alarm.AlarmParticulars;
 import com.jzy.alarmsystembackend.pojo.VO.AjaxResult;
 import com.jzy.alarmsystembackend.pojo.VO.firm.FirmParamVO1;
 import com.jzy.alarmsystembackend.service.firm.FirmService;

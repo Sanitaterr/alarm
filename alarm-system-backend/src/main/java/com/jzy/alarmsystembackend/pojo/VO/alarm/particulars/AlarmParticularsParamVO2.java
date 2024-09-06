@@ -7,7 +7,8 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 
 /**
- * source, occurTime
+ * source<br>
+ * occurTime
  */
 @Data
 public class AlarmParticularsParamVO2 implements Serializable {

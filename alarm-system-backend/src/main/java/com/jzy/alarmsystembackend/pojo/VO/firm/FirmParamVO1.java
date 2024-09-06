@@ -5,6 +5,9 @@ import lombok.Data;
 
 import java.io.Serializable;
 
+/**
+ * firmId
+ */
 @Data
 public class FirmParamVO1 implements Serializable {
 
