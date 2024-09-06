@@ -34,12 +34,6 @@ public class LoginServiceImpl implements LoginService {
         UserDetailsImpl loginUser = (UserDetailsImpl) authenticate.getPrincipal();
         User user = loginUser.getUser();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        WebAuthenticationDetails details = (WebAuthenticationDetails) authentication.getDetails();
-        System.out.println(details);
-        LoginLog loginLog = new LoginLog(null, details.getRemoteAddress(), details.getSessionId(), new Timestamp(System.currentTimeMillis()));
-        loginLogMapper.insert(loginLog);
-
         return JwtUtil.createJWT(user.getId().toString());
     }
 }

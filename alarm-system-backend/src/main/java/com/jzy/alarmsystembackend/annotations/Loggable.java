@@ -1,7 +1,6 @@
 package com.jzy.alarmsystembackend.annotations;
 
-import com.jzy.alarmsystembackend.service.log.ILogImpl;
-import org.springframework.stereotype.Component;
+import com.jzy.alarmsystembackend.service.log.MyLog;
 
 import java.lang.annotation.*;
 
@@ -9,7 +8,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface Loggable {
-    Class<? extends ILogImpl> value();
+    Class<? extends MyLog> value();
 
     String[] args() default {};
 }

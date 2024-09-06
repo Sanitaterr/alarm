@@ -3,13 +3,10 @@ package com.jzy.alarmsystembackend.service.impl.alarm.particulars;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.jzy.alarmsystembackend.annotations.AlarmLog;
-import com.jzy.alarmsystembackend.annotations.AlarmType;
 import com.jzy.alarmsystembackend.annotations.Loggable;
 import com.jzy.alarmsystembackend.mapper.alarm.AlarmParticularsMapper;
 import com.jzy.alarmsystembackend.pojo.DO.alarm.AlarmParticulars;
 import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO1;
-import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO7;
 import com.jzy.alarmsystembackend.service.alarm.particulars.AlarmParticularsService;
 import com.jzy.alarmsystembackend.service.impl.log.AlarmUpdateLogServiceImpl;
 import com.jzy.alarmsystembackend.service.user.InfoService;
@@ -445,9 +442,9 @@ public class AlarmParticularsServiceImpl implements AlarmParticularsService {
      * @param param AlarmParticularsParamVO1
      * @return Integer
      */
-    @AlarmLog("确认警报")
-    @Loggable(AlarmUpdateLogServiceImpl.class)
-    @AlarmType("确认警报")
+//    @AlarmLog("确认警报")
+    @Loggable(value = AlarmUpdateLogServiceImpl.class, args = "确认警报")
+//    @AlarmType("确认警报")
     @Override
     public Integer alarmConfirm(AlarmParticularsParamVO1 param) {
         AlarmParticulars alarmParticulars = selectAlarmById(param.getId());

@@ -1,15 +1,13 @@
 package com.jzy.alarmsystembackend.service.impl.log;
 
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.jzy.alarmsystembackend.annotations.AlarmType;
 import com.jzy.alarmsystembackend.annotations.Loggable;
 import com.jzy.alarmsystembackend.mapper.log.AlarmUpdateLogMapper;
 import com.jzy.alarmsystembackend.pojo.DO.User;
 import com.jzy.alarmsystembackend.pojo.DO.log.AlarmUpdateLog;
 import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO1;
 import com.jzy.alarmsystembackend.service.log.AlarmUpdateLogService;
-import com.jzy.alarmsystembackend.service.log.ILogImpl;
+import com.jzy.alarmsystembackend.service.log.MyLog;
 import com.jzy.alarmsystembackend.service.user.InfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +17,10 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 
 @Slf4j
 @Service
-public class AlarmUpdateLogServiceImpl implements AlarmUpdateLogService, ILogImpl {
+public class AlarmUpdateLogServiceImpl implements AlarmUpdateLogService, MyLog {
 
 
     @Autowired
