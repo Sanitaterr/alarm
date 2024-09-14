@@ -20,6 +20,7 @@ public class LoginController {
     @Loggable(LoginLogServiceImpl.class)
     @PostMapping("/user/login")
     public AjaxResult getToken(@RequestBody UserParamVO1 param) {
-        return AjaxResult.successProjectInfoData("login success", loginService.getToken(param.getUsername(), param.getPassword()));
+        return AjaxResult.successProjectInfoData("login success",
+                loginService.getToken(param.getUsername(), param.getPassword()));
     }
 }

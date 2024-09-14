@@ -26,6 +26,7 @@ public class AlarmParticularsServiceImpl implements AlarmParticularsService {
     @Autowired
     private AlarmParticularsMapper alarmParticularsMapper;
 
+    @SuppressWarnings("all")
     @Autowired
     private InfoService infoService;
 
@@ -34,6 +35,7 @@ public class AlarmParticularsServiceImpl implements AlarmParticularsService {
      *
      * @return List<Alarm>
      */
+    @Deprecated
     @Override
     public List<AlarmParticulars> selectAllAlarm() {
         return alarmParticularsMapper.selectList(null);

@@ -33,7 +33,7 @@ public class MqttConfig {
         DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
         MqttConnectOptions options = new MqttConnectOptions();
         options.setServerURIs(new String[]{"tcp://broker.emqx.io:1883"});
-        options.setUserName("user");
+        options.setUserName("user1");
         options.setPassword("123456".toCharArray());
         options.setConnectionTimeout(30); // 设置连接超时
         options.setAutomaticReconnect(true); // 自动重连
@@ -49,7 +49,7 @@ public class MqttConfig {
     @Bean
     public MessageProducer inbound() {
         MqttPahoMessageDrivenChannelAdapter adapter =
-                new MqttPahoMessageDrivenChannelAdapter("mqttx_24d03a0werfvwEVRWAEVRWEVRQwr", mqttClientFactory(),
+                new MqttPahoMessageDrivenChannelAdapter("mqttx_15d0a079", mqttClientFactory(),
                         "alarm");
         adapter.setCompletionTimeout(5000);
         adapter.setConverter(new DefaultPahoMessageConverter());
