@@ -2,8 +2,8 @@ package com.jzy.alarmsystembackend.service.alarm.particulars;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.jzy.alarmsystembackend.pojo.DO.alarm.AlarmParticulars;
+import com.jzy.alarmsystembackend.util.TimeEnum;
 import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO1;
-import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO7;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -48,4 +48,6 @@ public interface AlarmParticularsService {
     Integer alarmConfirm(AlarmParticularsParamVO1 param);
 
     Integer alarmRecover(AlarmParticularsParamVO1 param);
+
+    Integer alarmParticularsTimingHandling(Long number, TimeEnum timeEnum);
 }

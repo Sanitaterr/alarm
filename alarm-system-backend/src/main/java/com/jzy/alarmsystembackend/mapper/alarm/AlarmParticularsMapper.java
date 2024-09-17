@@ -25,4 +25,6 @@ public interface AlarmParticularsMapper extends BaseMapper<AlarmParticulars> {
     List<Map<String, Object>> selectAlarmNumsByTimeAuth(String timeType, @Param(Constants.WRAPPER) Wrapper<AlarmParticulars> wrapper);
 
     Integer selectAlarmNumsByWrapperAuth(@Param(Constants.WRAPPER) Wrapper<AlarmParticulars> wrapper);
+
+//    Integer alarmParticularsTimingHandling(TimeEnum timeEnum);
 }

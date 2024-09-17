@@ -1,11 +1,13 @@
 package com.jzy.alarmsystembackend.service.impl.alarm.particulars;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jzy.alarmsystembackend.annotations.Loggable;
 import com.jzy.alarmsystembackend.mapper.alarm.AlarmParticularsMapper;
 import com.jzy.alarmsystembackend.pojo.DO.alarm.AlarmParticulars;
+import com.jzy.alarmsystembackend.util.TimeEnum;
 import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO1;
 import com.jzy.alarmsystembackend.service.alarm.particulars.AlarmParticularsService;
 import com.jzy.alarmsystembackend.service.impl.log.AlarmUpdateLogServiceImpl;
@@ -18,6 +20,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -484,5 +487,41 @@ public class AlarmParticularsServiceImpl implements AlarmParticularsService {
             alarmParticulars.setRecoverTime(new Timestamp(System.currentTimeMillis()));
             return alarmParticularsMapper.updateById(alarmParticulars);
         }
+    }
+
+    /**
+     *
+     * 根据预设的timeEnum，设置到期处理机制
+     * @param timeEnum timeEnum
+     * @return Integer
+     * @author jzy
+     * @create 2024/9/17
+     **/
+    @Override
+    public Integer alarmParticularsTimingHandling(Long number, TimeEnum timeEnum) {
+        long currentTimeMillis = System.currentTimeMillis();
+
+        // 根据传入的 timeEnum 计算时间差，并转换为毫秒
+        long timeDifferenceMillis = timeEnum.convert(1, TimeUnit.MILLISECONDS);
+
+        // 计算需要筛选的最早发生时间
+        Timestamp thresholdTime = new Timestamp(currentTimeMillis - timeDifferenceMillis);
+
+        // 更新操作，将符合条件的记录的 confirmStatus 和 recoverStatus 设置为 true
+        LambdaUpdateWrapper<AlarmParticulars> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        lambdaUpdateWrapper
+                .ge(AlarmParticulars::getOccurTime, thresholdTime)
+                .and(wrapper -> wrapper
+                        .ne(AlarmParticulars::getConfirmStatus, true)
+                        .or(wrapper1 -> wrapper1
+                                .ne(AlarmParticulars::getRecoverStatus, true)))
+                .set(AlarmParticulars::getConfirmStatus, true)
+                .set(AlarmParticulars::getConfirmTime, new Timestamp(currentTimeMillis))
+                .set(AlarmParticulars::getRecoverStatus, true)
+                .set(AlarmParticulars::getRecoverTime, new Timestamp(currentTimeMillis));
+
+        // 执行更新操作，返回受影响的行数
+
+        return alarmParticularsMapper.update(null, lambdaUpdateWrapper);
     }
 }
