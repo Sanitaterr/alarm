@@ -5,11 +5,16 @@ import com.jzy.alarmsystembackend.mapper.alarm.AlarmParticularsMapper;
 import com.jzy.alarmsystembackend.pojo.DO.alarm.AlarmParticulars;
 import com.jzy.alarmsystembackend.pojo.VO.mqtt.MqttParamVO1;
 import com.jzy.alarmsystembackend.service.alarm.particulars.AlarmParticularsService;
+import com.jzy.alarmsystembackend.service.impl.alarm.particulars.AlarmProcessingService;
+import com.jzy.alarmsystembackend.util.AbstractSimpleBufferedConsumer;
+import com.jzy.alarmsystembackend.util.AlarmParticularsBufferedConsumer;
+import com.jzy.alarmsystembackend.util.RedisCache;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.core.MessageProducer;
@@ -23,6 +28,9 @@ import org.springframework.messaging.MessageHandler;
 
 import java.sql.Timestamp;
 import java.util.Random;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 @Configuration
 @Slf4j
@@ -64,6 +72,18 @@ public class MqttConfig {
     @Autowired
     private AlarmParticularsMapper alarmParticularsMapper;
 
+    @Autowired
+    private RedisCache redisCache;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    @Autowired
+    private AlarmProcessingService alarmProcessingService;
+
+    @Autowired
+    private AbstractSimpleBufferedConsumer abstractSimpleBufferedConsumer;
+
     @Bean
     @ServiceActivator(inputChannel = "mqttInputChannel")
     public MessageHandler handler() {
@@ -72,18 +92,6 @@ public class MqttConfig {
             String payload = message.getPayload().toString();
             System.out.println("Received message: " + payload + " from topic: " + topic);
             MqttParamVO1 param = JSONUtil.toBean(payload, MqttParamVO1.class);
-//            AlarmParticulars alarmParticulars = alarmParticularsService.selectAlarmById(param.getId());
-//            if (alarmParticulars != null) {
-//                AlarmParticulars alarmParticulars1 = new AlarmParticulars(null, alarmParticulars.getAlarmId(), alarmParticulars.getSource(), param.getType(), param.getLevel(), param.getOccurTime(), null, null, false, false, null);
-//                int i = alarmParticularsMapper.insert(alarmParticulars1);
-//                if (i > 0) {
-//                    log.info("new log: " + alarmParticulars1);
-//                } else {
-//                    log.error("insert failed!!!!!");
-//                }
-//            } else {
-//                log.error("id不存在，虚数据插入失败");
-//            }
 
             int min = 0;
             int max = 100;
@@ -107,21 +115,23 @@ public class MqttConfig {
                 }
             }
 
-//            log.info("--------------------------------------------");
-//            log.info("" + param.getOccurTime());
-//            log.info("" + flag1);
-//            log.info("" + conf);
-//            log.info("" + flag2);
-//            log.info("" + reco);
-//            log.info("--------------------------------------------");
-
             AlarmParticulars alarmParticulars = new AlarmParticulars(null, param.getId(), param.getSource(), param.getType(), param.getLevel(), param.getOccurTime(), conf, reco, flag1, flag2, null);
-            try {
-                alarmParticularsMapper.insert(alarmParticulars);
-                log.info("Inserted new alarm: {}", alarmParticulars);
-            } catch (Exception e) {
-                log.error("Failed to insert alarm: {}", e.getMessage(), e);
-            }
+//            try {
+//                alarmParticularsMapper.insert(alarmParticulars);
+//                log.info("Inserted new alarm: {}", alarmParticulars);
+//
+//                // 将报警数据缓存到 Redis
+//                String redisKey = "alarm:" + alarmParticulars.getId();
+//                redisCache.setCacheObject(redisKey, alarmParticulars);
+//                // 可选：设置过期时间
+//                redisCache.expire(redisKey, 10, TimeUnit.SECONDS);
+//                log.info(redisKey + "保存成功");
+//            } catch (Exception e) {
+//                log.error("Failed to insert alarm: {}", e.getMessage(), e);
+//            }
+
+            AlarmParticularsBufferedConsumer.getAlarmParticularsBufferedConsumer().setMaxSize(5);
+            abstractSimpleBufferedConsumer.add(alarmParticulars);
         };
     }
 }
