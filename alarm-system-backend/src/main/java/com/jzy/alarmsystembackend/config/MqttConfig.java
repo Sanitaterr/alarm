@@ -130,7 +130,7 @@ public class MqttConfig {
 //                log.error("Failed to insert alarm: {}", e.getMessage(), e);
 //            }
 
-            AlarmParticularsBufferedConsumer.getAlarmParticularsBufferedConsumer().setMaxSize(5);
+            AlarmParticularsBufferedConsumer.getAlarmParticularsBufferedConsumer().setMaxSize(10);
             abstractSimpleBufferedConsumer.add(alarmParticulars);
         };
     }

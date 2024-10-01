@@ -1,6 +1,8 @@
 package com.jzy.alarmsystembackend.service.impl.log;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jzy.alarmsystembackend.annotations.Loggable;
 import com.jzy.alarmsystembackend.mapper.log.LoginLogMapper;
 import com.jzy.alarmsystembackend.pojo.DO.User;
@@ -37,6 +39,11 @@ public class LoginLogServiceImpl implements LoginLogService, MyLog {
     @Override
     public List<LoginLog> getAllLoginLog() {
         return loginLogMapper.selectList(null);
+    }
+
+    @Override
+    public IPage<LoginLog> getAllLoginLogPaged(Long pageNum, Long pageSize) {
+        return loginLogMapper.selectPage(new Page<>(pageNum, pageSize), null);
     }
 
     @Override

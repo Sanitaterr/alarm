@@ -2,12 +2,14 @@ package com.jzy.alarmsystembackend.controller.log.user;
 
 import com.alibaba.fastjson.JSON;
 import com.jzy.alarmsystembackend.pojo.VO.AjaxResult;
+import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO3;
 import com.jzy.alarmsystembackend.service.log.LoginLogService;
 import com.jzy.alarmsystembackend.service.log.MyLog;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,5 +29,12 @@ public class LoginLogController {
         return AjaxResult.successProjectInfoData(
                 "get all login log success",
                 loginLogService.getAllLoginLog());
+    }
+
+    @PostMapping("/getAllLoginLogPaged")
+    public AjaxResult getAllLoginLogPaged(@RequestBody AlarmParticularsParamVO3 param) {
+        return AjaxResult.successProjectInfoData(
+                "get all login log paged success",
+                loginLogService.getAllLoginLogPaged(param.getPageNum(), param.getPageSize()));
     }
 }

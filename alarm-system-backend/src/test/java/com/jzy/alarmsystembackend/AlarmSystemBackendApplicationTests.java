@@ -1,7 +1,10 @@
 package com.jzy.alarmsystembackend;
 
+import com.jzy.alarmsystembackend.config.properties.AlarmTaskProperties;
 import com.jzy.alarmsystembackend.mapper.alarm.AlarmParticularsMapper;
 import com.jzy.alarmsystembackend.pojo.DO.alarm.AlarmParticulars;
+import com.jzy.alarmsystembackend.util.TimeEnum;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,7 +12,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @SpringBootTest
 class AlarmSystemBackendApplicationTests {
 
@@ -133,5 +138,18 @@ class AlarmSystemBackendApplicationTests {
             alarmParticular.setSource(split[1]);
             alarmParticularsMapper.updateById(alarmParticular);
         }
+    }
+
+    @Autowired
+    private AlarmTaskProperties alarmTaskProperties;
+    @Test
+    public void test1() {
+        TimeEnum timeEnum = TimeEnum.DAYS;
+        TimeUnit timeUnit = TimeUnit.DAYS;
+        Long number = 3L;
+        long timeDifferenceMillis = TimeEnum.MICROSECONDS.convert(number, timeUnit);
+        long timeDifferenceMillis1 = timeUnit.convert(number, TimeUnit.MILLISECONDS);
+        log.info(String.valueOf(timeDifferenceMillis));
+        log.info(String.valueOf(timeDifferenceMillis1));
     }
 }

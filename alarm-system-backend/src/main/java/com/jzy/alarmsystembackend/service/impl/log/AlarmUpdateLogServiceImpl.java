@@ -1,9 +1,13 @@
 package com.jzy.alarmsystembackend.service.impl.log;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jzy.alarmsystembackend.annotations.Loggable;
 import com.jzy.alarmsystembackend.mapper.log.AlarmUpdateLogMapper;
 import com.jzy.alarmsystembackend.pojo.DO.User;
+import com.jzy.alarmsystembackend.pojo.DO.alarm.AlarmParticulars;
 import com.jzy.alarmsystembackend.pojo.DO.log.AlarmUpdateLog;
 import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO1;
 import com.jzy.alarmsystembackend.service.log.AlarmUpdateLogService;
@@ -35,6 +39,15 @@ public class AlarmUpdateLogServiceImpl implements AlarmUpdateLogService, MyLog {
         lambdaQueryWrapper
                 .eq(AlarmUpdateLog::getFirm, infoService.getInfo().getFirmId());
         return alarmUpdateLogMapper.selectList(lambdaQueryWrapper);
+    }
+
+    @Override
+    public IPage<AlarmUpdateLog> getAllLogAuthPaged(Long pageNum, Long pageSize) {
+        LambdaQueryWrapper<AlarmUpdateLog> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        QueryWrapper<AlarmUpdateLog> wrapper = new QueryWrapper<>();
+        lambdaQueryWrapper
+                .eq(AlarmUpdateLog::getFirm, infoService.getInfo().getFirmId());
+        return alarmUpdateLogMapper.selectPage(new Page<>(pageNum, pageSize), wrapper);
     }
 
     @Override

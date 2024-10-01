@@ -6,6 +6,8 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+
 /**
  * @author JZY
  * @version 1.0
@@ -20,4 +22,10 @@ public class AlarmTaskProperties {
 
     private Long number;
     private TimeEnum unit;
+    private Long fixedRateInMillis;
+
+    @PostConstruct
+    public void init() {
+            fixedRateInMillis *= 24 * 60 * 60 * 1000;
+    }
 }

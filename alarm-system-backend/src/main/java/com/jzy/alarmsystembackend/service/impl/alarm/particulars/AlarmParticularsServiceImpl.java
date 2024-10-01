@@ -350,7 +350,8 @@ public class AlarmParticularsServiceImpl implements AlarmParticularsService {
     @Override
     public Integer selectAlarmNumsOneDayAuth(String time) {
         LambdaQueryWrapper<AlarmParticulars> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        if (SuCode.equals(infoService.getInfo().getFirmId())) {
+//        if (SuCode.equals(infoService.getInfo().getFirmId())) {
+        if (infoService.getInfo().getFirmId() != -1) {
             lambdaQueryWrapper
                     .apply("firm_id = {0}", infoService.getInfo().getFirmId());
         }
@@ -501,27 +502,52 @@ public class AlarmParticularsServiceImpl implements AlarmParticularsService {
     public Integer alarmParticularsTimingHandling(Long number, TimeEnum timeEnum) {
         long currentTimeMillis = System.currentTimeMillis();
 
+        TimeUnit timeUnit = null;
+        if (timeEnum == TimeEnum.DAYS) {
+            timeUnit = TimeUnit.DAYS;
+        } else if (timeEnum == TimeEnum.HOURS) {
+            timeUnit = TimeUnit.HOURS;
+        } else if (timeEnum == TimeEnum.MINUTES) {
+            timeUnit = TimeUnit.MINUTES;
+        }
         // 根据传入的 timeEnum 计算时间差，并转换为毫秒
-        long timeDifferenceMillis = timeEnum.convert(1, TimeUnit.MILLISECONDS);
+        long timeDifferenceMillis = TimeUnit.MILLISECONDS.convert(number, timeUnit);
 
         // 计算需要筛选的最早发生时间
         Timestamp thresholdTime = new Timestamp(currentTimeMillis - timeDifferenceMillis);
 
         // 更新操作，将符合条件的记录的 confirmStatus 和 recoverStatus 设置为 true
-        LambdaUpdateWrapper<AlarmParticulars> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
-        lambdaUpdateWrapper
-                .ge(AlarmParticulars::getOccurTime, thresholdTime)
+        LambdaQueryWrapper<AlarmParticulars> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper
+                .lt(AlarmParticulars::getOccurTime, thresholdTime)
                 .and(wrapper -> wrapper
                         .ne(AlarmParticulars::getConfirmStatus, true)
                         .or(wrapper1 -> wrapper1
-                                .ne(AlarmParticulars::getRecoverStatus, true)))
-                .set(AlarmParticulars::getConfirmStatus, true)
-                .set(AlarmParticulars::getConfirmTime, new Timestamp(currentTimeMillis))
-                .set(AlarmParticulars::getRecoverStatus, true)
-                .set(AlarmParticulars::getRecoverTime, new Timestamp(currentTimeMillis));
+                                .ne(AlarmParticulars::getRecoverStatus, true)));
+        List<AlarmParticulars> list = alarmParticularsMapper.selectList(lambdaQueryWrapper);
 
-        // 执行更新操作，返回受影响的行数
+        int updatedCount = 0;
 
-        return alarmParticularsMapper.update(null, lambdaUpdateWrapper);
+        for (AlarmParticulars record : list) {
+            LambdaUpdateWrapper<AlarmParticulars> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+            lambdaUpdateWrapper
+                    .eq(AlarmParticulars::getId, record.getId());
+
+            if (!record.getConfirmStatus()) {
+                lambdaUpdateWrapper
+                        .set(AlarmParticulars::getConfirmStatus, true)
+                        .set(AlarmParticulars::getConfirmTime, new Timestamp(currentTimeMillis));
+            }
+            if (!record.getRecoverStatus()) {
+                lambdaUpdateWrapper
+                        .set(AlarmParticulars::getRecoverStatus, true)
+                        .set(AlarmParticulars::getRecoverTime, new Timestamp(currentTimeMillis));
+            }
+
+            // 执行更新操作，更新单条记录
+            updatedCount += alarmParticularsMapper.update(null, lambdaUpdateWrapper);
+        }
+
+        return updatedCount;
     }
 }

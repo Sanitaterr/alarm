@@ -31,8 +31,6 @@ public class AlarmProcessingService {
 
     private ScheduledFuture<?> scheduledTask;
 
-
-
     @Scheduled(fixedRate = 10 * 1000) // 每10秒执行一次
     public void processQueue() {
         abstractSimpleBufferedConsumer.flush();
@@ -58,9 +56,8 @@ public class AlarmProcessingService {
             return;
         }
 
-        // 根据 TimeEnum 计算动态的 fixedRate
-        // 将 TimeEnum 转换为 milliseconds
-        long fixedRateInMillis = number * timeEnum.toMillis(1);
+        Long fixedRateInMillis = alarmTaskProperties.getFixedRateInMillis();
+        log.error(String.valueOf(fixedRateInMillis));
 
         scheduledTask = taskScheduler.scheduleAtFixedRate(() -> {
             alarmParticularsService.alarmParticularsTimingHandling(number, timeEnum);

@@ -1,5 +1,6 @@
 package com.jzy.alarmsystembackend.service.log;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.jzy.alarmsystembackend.pojo.DO.log.LoginLog;
 
 import java.util.List;
@@ -13,4 +14,5 @@ import java.util.List;
 public interface LoginLogService {
 
     List<LoginLog> getAllLoginLog();
+    IPage<LoginLog> getAllLoginLogPaged(Long pageNum, Long pageSize);
 }
