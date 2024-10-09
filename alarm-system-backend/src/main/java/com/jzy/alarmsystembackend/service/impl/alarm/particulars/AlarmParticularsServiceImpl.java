@@ -550,4 +550,17 @@ public class AlarmParticularsServiceImpl implements AlarmParticularsService {
 
         return updatedCount;
     }
+
+    /**
+     * 获取最新一条报警
+     * @return com.jzy.alarmsystembackend.pojo.DO.alarm.AlarmParticulars
+     * @author jzy
+     * @create 2024/10/6
+     **/
+    @Override
+    public AlarmParticulars getLatest() {
+        LambdaQueryWrapper<AlarmParticulars> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.orderByDesc(AlarmParticulars::getOccurTime).last("LIMIT 1");
+        return alarmParticularsMapper.selectOne(lambdaQueryWrapper);
+    }
 }

@@ -1,4 +1,4 @@
-package com.jzy.alarmsystembackend.controller;
+package com.jzy.alarmsystembackend.controller.alarm.particulars;
 
 import com.jzy.alarmsystembackend.Constant.GlobalConstant;
 import com.jzy.alarmsystembackend.pojo.SensorData;

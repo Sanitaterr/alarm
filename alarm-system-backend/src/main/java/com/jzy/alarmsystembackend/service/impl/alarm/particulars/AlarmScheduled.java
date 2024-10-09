@@ -13,7 +13,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Slf4j
@@ -24,6 +26,17 @@ public class AlarmScheduled {
 
     @Autowired
     private AlarmParticularsMapper alarmParticularsMapper;
+
+    // 存储最近的报警时间，key 为传感器的 MAC 地址，value 为最近的报警时间
+    private final Map<String, Timestamp> recentAlarms = new ConcurrentHashMap<>();
+
+    // 存储最近的温度值，key 为传感器的 MAC 地址，value 为最近的温度值
+    private final Map<String, Double> recentTemperatures = new ConcurrentHashMap<>();
+
+    // 定义报警的时间间隔，例如 5 分钟（以毫秒为单位）
+    private static final long ALARM_INTERVAL_MS = 1 * 60 * 1000;
+
+    private static final int WARNINGTEM = 30;
 
     @Scheduled(fixedRate = 1 * 1000)
     public void getAlarmParticulars() {
@@ -49,12 +62,35 @@ public class AlarmScheduled {
                         } else if (Objects.equals(mac, "ECE67BF6C106")) {
                             num = 81;
                         }
-                        log.info(temperature + " " + timestamp);
-                        if (temperature > 30) {
-                            log.error("温度过高超过30度");
-                            AlarmParticulars alarmParticulars = new AlarmParticulars(null, num, "泊森有限公司一楼生产车间" + num + "号", "温度过高", 1, new Timestamp(System.currentTimeMillis()), null, null, null, null, null);
+
+                        // 获取该传感器上一次记录的温度值
+                        Double lastTemperature = recentTemperatures.get(mac);
+
+                        // 如果温度与上一次相同，则跳过日志输出
+                        if (lastTemperature == null || lastTemperature != temperature) {
+                            // 更新最近温度
+                            recentTemperatures.put(mac, temperature);
+
+                            // 输出日志
+                            if (temperature < WARNINGTEM) {
+                                log.info(temperature + " " + timestamp);
+                            } else {
+                                log.error(temperature + " " + timestamp);
+                            }
+                        }
+
+                        // 获取传感器最近的报警时间
+                        Timestamp lastAlarmTime = recentAlarms.get(mac);
+
+                        if (temperature > WARNINGTEM && (lastAlarmTime == null ||
+                                (System.currentTimeMillis() - lastAlarmTime.getTime()) > ALARM_INTERVAL_MS)) {
+                            log.error("温度过高超过" + WARNINGTEM + "度");
+                            AlarmParticulars alarmParticulars = new AlarmParticulars(null, num, "泊森有限公司一楼生产车间" + num + "号", "温度过高", 1, new Timestamp(System.currentTimeMillis()), null, null, null, null, "温度过高达到" + String.format("%.2f", temperature) + "度");
                             alarmParticularsMapper.insert(alarmParticulars);
                             log.error("数据插入成功");
+
+                            // 更新该传感器的最近报警时间
+                            recentAlarms.put(mac, new Timestamp(System.currentTimeMillis()));
                         }
                     });
                 }).subscribe();

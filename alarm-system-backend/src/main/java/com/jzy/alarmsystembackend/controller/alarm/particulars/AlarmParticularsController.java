@@ -132,4 +132,16 @@ public class AlarmParticularsController {
                 alarmParticularsService.selectRealtimeAlarmOrderedAuth()
         );
     }
+
+    /**
+     * 获取最新的一条报警
+     * @return AjaxResult
+     */
+    @PostMapping("/getLatest")
+    public AjaxResult getLatest() {
+        return AjaxResult.successProjectInfoData(
+                "get the latest alarm info success",
+                alarmParticularsService.getLatest()
+        );
+    }
 }

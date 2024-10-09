@@ -34,7 +34,7 @@ public class AlarmProcessingService {
     @Scheduled(fixedRate = 10 * 1000) // 每10秒执行一次
     public void processQueue() {
         abstractSimpleBufferedConsumer.flush();
-        log.info("定时刷新成功");
+        log.info("scheduled flush success");
     }
 
     @PostConstruct

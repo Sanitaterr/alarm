@@ -50,4 +50,6 @@ public interface AlarmParticularsService {
     Integer alarmRecover(AlarmParticularsParamVO1 param);
 
     Integer alarmParticularsTimingHandling(Long number, TimeEnum timeEnum);
+
+    AlarmParticulars getLatest();
 }
