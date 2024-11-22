@@ -30,19 +30,40 @@ public class WhiteListLogAspect {
 
     private AntPathMatcher pathMatcher = new AntPathMatcher();
 
+//    @Around("execution(* com.jzy.alarmsystembackend.controller..*(..))")
+//    public Object doBefore(ProceedingJoinPoint pjp) throws Throwable {
+//        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+//        String requestURI = request.getRequestURI();
+//        long beg = System.currentTimeMillis();
+//        Object result= pjp.proceed();
+//
+//        if (shouldLog(requestURI)) {
+//            addLog((MethodSignature) pjp.getSignature(),pjp.getArgs(),result,System.currentTimeMillis()-beg);
+//        }
+//
+//        return result;
+//    }
+
     @Around("execution(* com.jzy.alarmsystembackend.controller..*(..))")
     public Object doBefore(ProceedingJoinPoint pjp) throws Throwable {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes == null) {
+            log.error("No request attributes found for current thread");
+            return pjp.proceed(); // 或者抛出异常
+        }
+
+        HttpServletRequest request = attributes.getRequest();
         String requestURI = request.getRequestURI();
         long beg = System.currentTimeMillis();
-        Object result= pjp.proceed();
+        Object result = pjp.proceed();
 
         if (shouldLog(requestURI)) {
-            addLog((MethodSignature) pjp.getSignature(),pjp.getArgs(),result,System.currentTimeMillis()-beg);
+            addLog((MethodSignature) pjp.getSignature(), pjp.getArgs(), result, System.currentTimeMillis() - beg);
         }
 
         return result;
     }
+
 
     /**
      * 日志记录入库操作

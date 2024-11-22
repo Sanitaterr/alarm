@@ -1,5 +1,8 @@
 package com.jzy.alarmsystembackend.util;
 
+import org.redisson.Redisson;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundSetOperations;
 import org.springframework.data.redis.core.HashOperations;
@@ -16,6 +19,42 @@ public class RedisCache {
 
     @Autowired
     public RedisTemplate redisTemplate;
+
+    @Autowired
+    private RedissonClient redissonClient;
+
+    /**
+     * 获取 Redisson 分布式锁
+     * @param key
+     * @param timeout
+     * @param unit
+     * @return boolean
+     * @author jzy
+     * @create 2024/11/1
+     **/
+    public boolean tryLock(String key, long timeout, TimeUnit unit) {
+        RLock lock = redissonClient.getLock(key);
+        try {
+            return lock.tryLock(timeout, unit);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
+        }
+    }
+
+    /**
+     * 释放 Redisson 分布式锁
+     * @param key
+     * @return void
+     * @author jzy
+     * @create 2024/11/1
+     **/
+    public void unlock(String key) {
+        RLock lock = redissonClient.getLock(key);
+        if (lock.isHeldByCurrentThread()) {
+            lock.unlock();
+        }
+    }
 
     /**
      *

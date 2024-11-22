@@ -6,6 +6,7 @@ import com.jzy.alarmsystembackend.pojo.DO.alarm.AlarmParticulars;
 import com.jzy.alarmsystembackend.util.TimeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -151,5 +152,25 @@ class AlarmSystemBackendApplicationTests {
         long timeDifferenceMillis1 = timeUnit.convert(number, TimeUnit.MILLISECONDS);
         log.info(String.valueOf(timeDifferenceMillis));
         log.info(String.valueOf(timeDifferenceMillis1));
+    }
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Test
+    public void test2() {
+        String queueName = "simple.queue";
+        String msg = "hello, amqp!";
+        rabbitTemplate.convertAndSend(queueName, msg);
+    }
+
+    @Test
+    public void testWorkQueue() throws InterruptedException {
+        String queueName = "work.queue";
+        for (int i = 1; i <= 50; i ++ ) {
+            String msg = "hello, worker, message_" + i;
+            rabbitTemplate.convertAndSend(queueName, msg);
+            Thread.sleep(20);
+        }
     }
 }

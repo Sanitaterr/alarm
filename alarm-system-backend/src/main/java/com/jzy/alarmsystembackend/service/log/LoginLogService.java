@@ -1,7 +1,9 @@
 package com.jzy.alarmsystembackend.service.log;
 
+import cn.hutool.log.Log;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.jzy.alarmsystembackend.pojo.DO.log.LoginLog;
+import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO11;
 
 import java.util.List;
 
@@ -15,4 +17,6 @@ public interface LoginLogService {
 
     List<LoginLog> getAllLoginLog();
     IPage<LoginLog> getAllLoginLogPaged(Long pageNum, Long pageSize);
+    List<LoginLog> selectByIp(String ip);
+    IPage<LoginLog> selectByIpPaged(AlarmParticularsParamVO11 param);
 }

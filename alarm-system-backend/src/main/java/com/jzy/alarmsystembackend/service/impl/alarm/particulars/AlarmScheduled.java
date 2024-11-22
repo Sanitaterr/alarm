@@ -1,6 +1,7 @@
 package com.jzy.alarmsystembackend.service.impl.alarm.particulars;
 
 import com.jzy.alarmsystembackend.Constant.GlobalConstant;
+import com.jzy.alarmsystembackend.controller.alarm.particulars.MapController;
 import com.jzy.alarmsystembackend.mapper.alarm.AlarmParticularsMapper;
 import com.jzy.alarmsystembackend.pojo.DO.alarm.AlarmParticulars;
 import com.jzy.alarmsystembackend.pojo.SensorData;
@@ -36,7 +37,13 @@ public class AlarmScheduled {
     // 定义报警的时间间隔，例如 5 分钟（以毫秒为单位）
     private static final long ALARM_INTERVAL_MS = 1 * 60 * 1000;
 
+    /**
+     * 报警温度阈值 单位：摄氏度
+     **/
     private static final int WARNINGTEM = 30;
+
+    @Autowired
+    private MapController mapController;
 
     @Scheduled(fixedRate = 1 * 1000)
     public void getAlarmParticulars() {
@@ -80,7 +87,16 @@ public class AlarmScheduled {
                         }
 
                         // 获取传感器最近的报警时间
+
+
+
+
                         Timestamp lastAlarmTime = recentAlarms.get(mac);
+
+                        if (temperature > WARNINGTEM) {
+                            AlarmParticulars alarmParticulars = new AlarmParticulars(null, num, "泊森有限公司一楼生产车间" + num + "号", "温度过高", 1, new Timestamp(System.currentTimeMillis()), null, null, null, null, "温度过高达到" + String.format("%.2f", temperature) + "度");
+                            mapController.notifyFrontend(alarmParticulars); // 调用控制器方法
+                        }
 
                         if (temperature > WARNINGTEM && (lastAlarmTime == null ||
                                 (System.currentTimeMillis() - lastAlarmTime.getTime()) > ALARM_INTERVAL_MS)) {
@@ -88,6 +104,9 @@ public class AlarmScheduled {
                             AlarmParticulars alarmParticulars = new AlarmParticulars(null, num, "泊森有限公司一楼生产车间" + num + "号", "温度过高", 1, new Timestamp(System.currentTimeMillis()), null, null, null, null, "温度过高达到" + String.format("%.2f", temperature) + "度");
                             alarmParticularsMapper.insert(alarmParticulars);
                             log.error("数据插入成功");
+
+                            // TODO
+//                            mapController.notifyFrontend(alarmParticulars); // 调用控制器方法
 
                             // 更新该传感器的最近报警时间
                             recentAlarms.put(mac, new Timestamp(System.currentTimeMillis()));

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录</title>
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+   
+    <div class="shell">
+      
+        <div class="container b-container" id="b-container">
+            <form action="" method="" class="form" id="b-form">
+                <h2 class="form_title title">登入账号</h2>
+                
+                <input type="text" id="t1" class="form_input" placeholder="请输入账号">
+                <input type="password" id="t2" class="form_input" placeholder="请输入密码">
+                <p>
+                  <input type="text" id="text" class="form_yzm" placeholder="请输入验证码">  
+                  <span id="code" class="yzm"></span>
+                </p>
+                
+                <a class="form_link">忘记密码？</a>
+               
+                <button class="form_button button submit" onclick="qdcode()" id="logbuttom">登录</button>
+                <div>
+                    <span class="other">其他方式登入</span>
+                    <div>
+                        <a href="#" class="icoV">微信</a>
+                        <a href="#" class="icoz">手机号码</a>
+                        <a href="#" class="icoQ" >QQ</a>
+                        
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="container a-container" id="a-container">
+            <form  class="form" id="a-form">
+                <h2 class="form_title title">创建账号</h2>
+                
+               
+                <input type="text" id="t3" class="form_input" placeholder="请输入名字" name="username">
+                <input type="password" id="t4" class="form_input" placeholder="请输入密码" name="password">
+                <input type="password" id="t5" class="form_input" placeholder="请确认密码" name="confirmedPassword">
+              
+                <button class="form_button button submit" id="regbutton" onclick="cj()">创建</button>
+            </form>
+        </div>
+        <div class="switch" id="switch-cnt">
+            <div class="switch_circle"></div>
+            <div class="switch_circle switch_circle-t"></div>
+            <div class="switch_container" id="switch-c1">
+                <h2 class="switch_title title" style="letter-spacing: 0;">已有账号？</h2>
+                <p class="switch_description description">用户可以通过手机号、邮箱号等方式进行登录！欢迎用户使用工业报警系统！</p>
+                <button class="switch_button button switch-btn">登入</button>
+            </div>
+            <div class="switch_container is-hidden" id="switch-c2">
+                <h2 class="switch_title title" style="letter-spacing: 0;">还没有账号吗?</h2>
+                <p class="switch_description description">用户可以通过手机号、邮箱号等方式，去注册一个新账号。</p>
+                <button class="switch_button button switch-btn">创建</button>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="./form-serialize/form-resialize.js"></script>
+    <script src="./utils/request.js"></script>
+    <script src="js/login.js"></script>
+</body>
+
+</html>

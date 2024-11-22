@@ -36,7 +36,11 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     public List<Alarm> selectAllAlarmAuth() {
         LambdaQueryWrapper<Alarm> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(Alarm::getFirmId, infoService.getInfo().getFirmId());
+        if (infoService.getInfo().getFirmId() == 0) {
+            return null;
+        } else if (infoService.getInfo().getFirmId() != -1) {
+            lambdaQueryWrapper.eq(Alarm::getFirmId, infoService.getInfo().getFirmId());
+        }
         return alarmMapper.selectList(lambdaQueryWrapper);
     }
 
@@ -53,7 +57,11 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     public IPage<Alarm> selectAllAlarmPagedAuth(Long pageNum, Long pageSize) {
         LambdaQueryWrapper<Alarm> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(Alarm::getFirmId, infoService.getInfo().getFirmId());
+        if (infoService.getInfo().getFirmId() == 0) {
+            return null;
+        } else if (infoService.getInfo().getFirmId() != -1) {
+            lambdaQueryWrapper.eq(Alarm::getFirmId, infoService.getInfo().getFirmId());
+        }
         Page<Alarm> page = new Page<>(pageNum, pageSize);
         return alarmMapper.selectPage(page, lambdaQueryWrapper);
     }

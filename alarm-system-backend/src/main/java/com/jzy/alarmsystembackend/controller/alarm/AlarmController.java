@@ -30,7 +30,8 @@ public class AlarmController {
     }
 
     @PostMapping("/selectAllAlarmPaged")
-    public AjaxResult selectAllAlarmPaged(@RequestBody AlarmParamVO1 param) {
+    public AjaxResult
+    selectAllAlarmPaged(@RequestBody AlarmParamVO1 param) {
         return AjaxResult.successProjectInfoData(
                 "select all alarm paged success",
                 alarmService.selectAllAlarmPagedAuth(param.getPageNum(), param.getPageSize()));

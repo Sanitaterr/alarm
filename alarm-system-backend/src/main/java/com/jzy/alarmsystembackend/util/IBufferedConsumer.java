@@ -13,7 +13,7 @@ public interface IBufferedConsumer<T> extends Consumer<T> {
      * 添加待处理的数据进缓存区
      *
      * @param t t
-     */
+     */;
     public void add(T t);
 
     /**

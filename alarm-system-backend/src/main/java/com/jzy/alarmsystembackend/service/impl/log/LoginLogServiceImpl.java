@@ -1,14 +1,17 @@
 package com.jzy.alarmsystembackend.service.impl.log;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jzy.alarmsystembackend.annotations.Loggable;
 import com.jzy.alarmsystembackend.mapper.log.LoginLogMapper;
 import com.jzy.alarmsystembackend.pojo.DO.User;
+import com.jzy.alarmsystembackend.pojo.DO.alarm.AlarmParticulars;
 import com.jzy.alarmsystembackend.pojo.DO.log.AlarmUpdateLog;
 import com.jzy.alarmsystembackend.pojo.DO.log.LoginLog;
 import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO1;
+import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO11;
 import com.jzy.alarmsystembackend.service.log.LoginLogService;
 import com.jzy.alarmsystembackend.service.log.MyLog;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +47,21 @@ public class LoginLogServiceImpl implements LoginLogService, MyLog {
     @Override
     public IPage<LoginLog> getAllLoginLogPaged(Long pageNum, Long pageSize) {
         return loginLogMapper.selectPage(new Page<>(pageNum, pageSize), null);
+    }
+
+    @Override
+    public List<LoginLog> selectByIp(String ip) {
+        LambdaQueryWrapper<LoginLog> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(LoginLog::getIp, ip);
+        return loginLogMapper.selectList(lambdaQueryWrapper);
+    }
+
+    @Override
+    public IPage<LoginLog> selectByIpPaged(AlarmParticularsParamVO11 param) {
+        LambdaQueryWrapper<LoginLog> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(LoginLog::getIp, param.getIp());
+        Page<LoginLog> page = new Page<>(param.getPageNum(), param.getPageSize());
+        return loginLogMapper.selectPage(page, lambdaQueryWrapper);
     }
 
     @Override

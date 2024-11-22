@@ -1,9 +1,7 @@
 package com.jzy.alarmsystembackend.controller.alarm.particulars;
 
 import com.jzy.alarmsystembackend.pojo.VO.AjaxResult;
-import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO1;
-import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO2;
-import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO3;
+import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.*;
 import com.jzy.alarmsystembackend.service.alarm.particulars.AlarmParticularsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -142,6 +140,30 @@ public class AlarmParticularsController {
         return AjaxResult.successProjectInfoData(
                 "get the latest alarm info success",
                 alarmParticularsService.getLatest()
+        );
+    }
+
+    /**
+     * 多条件查
+     * @return AjaxResult
+     */
+    @PostMapping("/selectCondition")
+    public AjaxResult selectCondition(@RequestBody AlarmParticularsParamVO8 param) {
+        return AjaxResult.successProjectInfoData(
+                "success",
+                alarmParticularsService.selectCondition(param)
+        );
+    }
+
+    /**
+     * 多条件查 带分页
+     * @return AjaxResult
+     */
+    @PostMapping("/selectConditionPaged")
+    public AjaxResult selectConditionPaged(@RequestBody AlarmParticularsParamVO13 param) {
+        return AjaxResult.successProjectInfoData(
+                "success",
+                alarmParticularsService.selectConditionPaged(param)
         );
     }
 }

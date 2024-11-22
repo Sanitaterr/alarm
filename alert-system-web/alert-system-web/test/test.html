@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .date-box {
+      width: 280px;
+      height: 300px;
+      position: relative;
+      overflow: hidden;
+      color: #606266;
+    }
+    .date-box input {
+      width: 100%;
+      height: 32px;
+      box-shadow: 2px 2px 5px #eee;
+      border-radius: 4px;
+      border: 1px solid #eee;
+      box-sizing: border-box;
+      text-align: center;
+      outline: none;
+    }
+    .date-box .date {
+      width: 100%;
+      height: calc(100% - 40px);
+      box-shadow: 2px 2px 5px #ccc;
+      border-radius: 4px;
+      border: 1px solid #eee;
+      position: absolute;
+      left: 0;
+      top: 40px;
+      box-sizing: border-box;
+      display: none;
+    }
+    .date-box .date .date-header {
+      width: 100%;
+      height: 30px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+    .date-box .date-table {
+      width: 100%;
+      height: calc(100% - 30px);
+    }
+    .date-box .date-table tr td {
+      border-collapse: collapse;
+    }
+    .date-box .date-table thead {
+      width: 100%;
+      height: 30px;
+    }
+    .date-box .date-table thead tr {
+      width: 100%;
+      height: 100%;
+    }
+    .date-box .date-table tbody {
+      width: 100%;
+      height: calc(100% - 30px);
+    }
+    .date-box .date-table tbody tr {
+      text-align: center;
+      vertical-align: middle;
+    }
+    .date-box .date-table tbody tr td:hover {
+      color: #409eff;
+    }
+  </style>
+
+</head>
+<body>
+  <div class="date-box">
+    <input type="text" placeholder="请输入日期" class="date-input" />
+    <div class="date">
+      <div class="date-header">
+        <div class="pre-date"><<</div>
+        <div class="show-year-month"></div>
+        <div class="next-date">>></div>
+      </div>
+      <table class="date-table">
+        <thead>
+          <tr>
+            <th>一</th>
+            <th>二</th>
+            <th>三</th>
+            <th>四</th>
+            <th>五</th>
+            <th>六</th>
+            <th>日</th>
+          </tr>
+        </thead>
+        <tbody class="date-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+          let date = new Date() //日期对象
+      let currentYear = date.getFullYear() // 当前年
+      let currentMonth = date.getMonth() // 当前月
+      let currentDate = date.getDate() // 当前日
+      let setCurrentDateFlag = false // 是否设置了当前日背景,默认为false
+      let selectDate = '' //选中日期
+      // 展示年月日
+      $('.show-year-month').textContent = `${currentYear}年${currentMonth + 1}月`
+      // 上个月按钮
+      $('.pre-date').onclick = function () {
+        currentMonth = currentMonth - 1
+        // 当当前月小于0，将当前月设置为11月
+        if (currentMonth < 0) {
+          currentMonth = 11
+          currentYear = currentYear - 1
+        }
+        $('.show-year-month').textContent = `${currentYear}年${currentMonth + 1}月`
+        setCurrentDateFlag = false
+        getMultidimensionalArrayByDay(currentYear, currentMonth)
+      }
+      // 下个月按钮
+      $('.next-date').onclick = function () {
+        currentMonth = currentMonth + 1
+        // 当当前月大于12,将当前月重置为1
+        if (currentMonth > 12) {
+          currentMonth = 1
+          currentYear = currentYear + 1
+        }
+        $('.show-year-month').textContent = `${currentYear}年${currentMonth + 1}月`
+        setCurrentDateFlag = false
+        getMultidimensionalArrayByDay(currentYear, currentMonth)
+      }
+      // 日期选择框input
+      $('.date-input').onclick = function () {
+        if ($('.date').style.display == 'none' || !$('.date').style.display) {
+          $('.date').style.display = 'inline-block'
+          observeTdClick()
+        } else {
+          $('.date').style.display = 'none'
+        }
+      }
+      // 获取年月日数组
+      function getMultidimensionalArrayByDay(currentYear, currentMonth) {
+        // 清除dom，重新渲染表格
+        let trList = Array.from($('.date-tbody').children)
+        if (trList && trList.length) {
+          trList.map(item => {
+            $('.date-tbody').removeChild(item)
+          })
+        }
+        let d = new Date(currentYear, currentMonth)
+        d.setDate(1)
+        let startDay = d.getDay()
+        let count = 0
+        let nextPreMonthCount = 0
+        let multidimensionalArray = []
+        // 一共有6个tr，6行
+        for (let i = 0; i < 6; i++) {
+         // 设置列数 这里是7列
+          let dayColumnList = new Array(7)
+          if (i === 0) {
+            //  第一行  startDay 当前月的第一天是周几 假设 startDay = 5  那么 j = 4  
+            // dayColumnList.length 7           
+            // [,,,,1,2,3]
+            for (let j = startDay - 1; j < dayColumnList.length; j++) {
+              dayColumnList[j] = ++count
+            }
+          } else {
+            // 按照上述假设，此时count = 4, dayColumnList.length = 7  0,1,2,3,4,5,6
+            for (let j = 0; j < dayColumnList.length; j++) {
+              count++
+              // 按照上述假设， getDayNumsByMonth(d.getMonth())返回值为31
+              // 超过当前月天数,开始下个月天数加1填充
+              if (count > getDayNumsByMonth(d.getMonth())) {
+                dayColumnList[j] = ++nextPreMonthCount
+              } else {
+                // 没超过当前月天数的情况
+                dayColumnList[j] = count
+              }
+            }
+          }
+          multidimensionalArray.push(dayColumnList)
+        }
+        // 填充第一行为空的日期
+        let preMonthDayNums = getDayNumsByMonth(d.getMonth() - 1)
+        for (let k = d.getDay() - 2; k >= 0; k--) {
+          multidimensionalArray[0][k] = preMonthDayNums--
+        }
+        let nextMonthNums = getDayNumsByMonth(d.getMonth() + 1)
+        let realCurrentYear = date.getFullYear()
+        let realCurrentMonth = date.getMonth()
+        // 渲染表格
+        for (let q = 0; q < multidimensionalArray.length; q++) {
+          let tr = document.createElement('tr')
+          let item = multidimensionalArray[q]
+          for (let m = 0; m < item.length; m++) {
+            let td = document.createElement('td')
+            td.textContent = item[m]
+            // 当前年月日背景色为蓝色，颜色为白色
+            if (!setCurrentDateFlag && item[m] === currentDate && realCurrentYear === currentYear && realCurrentMonth === currentMonth) {
+              td.style.backgroundColor = 'blue'
+              td.style.color = 'white'
+              setCurrentDateFlag = true
+            }
+            tr.appendChild(td)
+          }
+          $('.date-tbody').appendChild(tr)
+        }
+      }
+      // 获取一个月有多少天
+      function getDayNumsByMonth(currentMonth) {
+        let d = new Date()
+        d.setMonth(currentMonth + 1)
+        d.setDate(0) // 可以获取一个月有多少天
+        let dayNums = d.getDate()
+        return dayNums
+      }
+      // 监听点击选择日期事件
+      function observeTdClick() {
+        let tdList = Array.from(document.getElementsByTagName('td'))
+        tdList.forEach(td => {
+          td.onclick = function () {
+            let day = td.textContent
+            selectDate = `${currentYear}-${currentMonth + 1}-${day}`
+            $('.date-input').value = selectDate
+            $('.date').style.display = 'none'
+          }
+        })
+      }
+      function $(selector) {
+        return document.querySelector(selector)
+      }
+      getMultidimensionalArrayByDay(currentYear, currentMonth)
+
+  </script>
+</body>
+</html>

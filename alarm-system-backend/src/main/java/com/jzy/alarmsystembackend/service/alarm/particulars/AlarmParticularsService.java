@@ -2,6 +2,9 @@ package com.jzy.alarmsystembackend.service.alarm.particulars;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.jzy.alarmsystembackend.pojo.DO.alarm.AlarmParticulars;
+import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO13;
+import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO3;
+import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO8;
 import com.jzy.alarmsystembackend.util.TimeEnum;
 import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO1;
 
@@ -52,4 +55,7 @@ public interface AlarmParticularsService {
     Integer alarmParticularsTimingHandling(Long number, TimeEnum timeEnum);
 
     AlarmParticulars getLatest();
+
+    List<AlarmParticulars> selectCondition(AlarmParticularsParamVO8 param);
+    IPage<AlarmParticulars> selectConditionPaged(AlarmParticularsParamVO13 param);
 }

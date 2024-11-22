@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PC</title>
+    <link rel="stylesheet" href="css/index.css">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 引入 SockJS -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
+    <!-- 引入 Stomp.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs/lib/stomp.min.js"></script>
+
+</head>
+
+<body>
+    <div class="bg">
+        <!-- 时间和登录 -->
+        <div class="time"></div>
+        <!-- 工业报警 -->
+        <div class="title">
+            <div style="font-size:2.5rem;color: #3af0f8;  ">工业报警系统</div>
+        </div>
+        <!-- 用户相关 -->
+        <div class="user">
+            <img class="userImg1" src="img/user.png"><a class="u" href="#">当前用户：admin</a>
+            <span class="us">&ensp;|&ensp;</span>
+            <img class="userImg2" src="img/out.png"><a class="exit" href="#">退出登录</a>
+        </div>">
+
+        <!-- 三个框 -->
+        <div
+            style="margin-top: 1.25%;padding-left: 3.5%;display: flex;justify-content: space-between;padding-right: 2.7%;">
+            <!-- 设备监测数据分析 -->
+            <div>
+                <div class="tj">
+                    <div style="position: relative;">
+                        <img src="./img/sTitle.png" class="sTiltleImg">
+                        <div class="sTiltle">监测分析</div>
+                    </div>
+                    <div class="data">
+                        <div class="datatime">
+                            <div>
+                                <div class="i1" id="id1"></div>
+                                <div class="i1" id="id2"></div>
+                                <div class="i1" id="id5"></div>
+                            </div>
+                            <div class="timepart">
+                                <div class="timeparts timeactive" id="time1">近一周</div>
+                                <div class="timeparts" id="time2">近一月</div>
+                                <div class="timeparts" id="time4">近一年</div>
+                            </div>
+                        </div>
+                        <!-- <div class="i2" id="id2"></div> -->
+                        <div class="i3" id="id3"></div>
+                    </div>
+                    <div class="tjBottom"></div>
+                </div>
+            </div>
+            <!-- 中间 -->
+
+            <!-- 浮窗 -->
+            <div id="infoPopup" class="popup" style="display: none;">
+                <div class="popup-header">
+                    <span>点信息</span>
+                    <button id="closePopup">×</button>
+                </div>
+                <div id="popupContent"></div>
+            </div>
+
+            
+
+
+            <div>
+                <div class="jg">
+                    <img src="./img/sTitle.png"
+                        style="width: 30vw;height: 11.5vh;position: absolute;left: 1%;top: -1%;">
+                    <div class="sTiltle2"><img src="img/三角形.png" style="width: 1rem;">今日告警</div>
+                    <div style="display: flex;margin-top: 15%;">
+                        <div class="wtb">
+                            <img src="img/总计.png" style="width: 3rem;height: 3rem;margin-left: 4vh;" class="jgImg1">
+                            <div style="text-align: center;">
+                                <div class="wz">今日报警总数</div>
+                                <div class="tx" id="alltx">110</div>
+                            </div>
+                        </div>
+                        <div class="wtb">
+                            <img src="img/未处理.png" style="width: 3rem;height: 3rem;margin-left: 6vh;" class="jgImg2">
+                            <div style="text-align: center;">
+                                <div class="wz">历史</div>
+                                <div class="tx" id="histx">5</div>
+                            </div>
+                        </div>
+                        <div class="wtb">
+                            <img src="img/已处理.png" style="width: 3rem;height: 3rem;margin-left:8vh;" class="jgImg3">
+                            <div style="text-align: center;">
+                                <div class="wz">实时</div>
+                                <div class="tx" id="reltx">50</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="jgBottom"></div>
+                </div>
+
+                <div class="lb">
+                    <div class="carousel-container">
+                        <ul class="carousel">
+                        </ul>
+                    </div>
+                    <div class="lbBottom"></div>
+                </div>
+
+                <div class="bj">
+                    <div id="container"></div>
+                    <div class="bjBottom"></div>
+                </div>
+
+            </div>
+            <div>
+                <div class="right">
+                    <div class="sTiltle3">
+                        <img src="img/响铃.png" style="width: 2.4vh;" class="rightImg">
+                        <div style="margin-left: 17%;width: 10vw;"> 实时警报</div>
+                    </div>
+                    <img src="./img/搜索框.png" class="rightsearch">
+                    <div class="rightinput">
+                        <form class="expandform">
+                            <div class="expand">
+                                <div class="expandpart">
+                                    <div class="expandtitle">警报源：</div>
+                                    <div class="expandinput">
+                                        <input type="text" placeholder="请在此输入警报源" id="expin1" name="source"> 
+                                    </div>
+                                </div>
+                                <div class="expandpart">
+                                    <div class="expandtitle">警报发生时间：</div>
+                                    <div class="expandinput">
+                                        <input type="text" placeholder="请在此输入警报发生时间" id="expin2" name="occur_time">
+                                    </div>
+                                </div>
+                                <img src="./img/makesure.png" class="expandsure" >
+                            </div>
+                        </form>
+                        <div class="line"></div>
+                        <p class="expandp">
+                            暂无数据哦
+                        </p>
+                    </div>
+                    <div style="margin-left: 1.5%;margin-top: 12.5%;z-index: 999999;" >
+                       <div class="partsP">
+                       </div>
+                        <div class="center">
+                            <ul class="pagination">
+                            </ul>
+                            <div class="xj">共100条</div>
+                        </div>   
+                    </div>
+                    <div class="rightBottom"></div>
+                </div>
+
+            </div>
+            
+        </div>
+        <div class="clearfix">
+        </div>
+
+        <div class="bottom" style="display: flex;">
+            <div style="text-align: center;cursor: pointer;margin-top: 0.45%;" class="popbutton">
+                <img src="./img/urgent.png" style="width: 3.8vh;height: 3.9vh;" >
+                <div class="button">紧急处理</div>
+            </div>
+            <div style="text-align: center;cursor: pointer;" class="bosure">
+                <img src="./img/sure.png" style="width: 4vh;height: 4.5vh;">
+                <div class="button">一键确认</div>
+            </div>
+            <a href="./lsjl.html">
+                <div style="text-align: center;cursor: pointer;">
+                    <img src="./img/all.png" style="width: 4vh;height: 4.5vh;">
+                    <div class="button">全部查找</div>
+                </div>
+            </a>
+        </div>
+
+    </div>
+    <div class="Pop-ups">
+        <div class="popContent">
+            <img src="./img/poptop.gif" class="imgtoppop">
+            <div class="poptop">
+                <div class="poptiltle">紧急警报列表</div>
+                <div class="close"><img src="./img/close.png" style="width: 2.8vw;height: 5.3vh;" id="closeimg"></div>
+            </div>
+            <img src="./img/popbody.PNG" class="popbody">
+            <div class="contentpop">
+                <div class="poppartp">
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    </div>
+    <div class="success">警报已确认</div>
+    <div class="blackbody">
+        <div class="bjclass">
+            <div class="bjs">
+                <img src="./img/sTitle.png" style="width: 52vh;height: 11.5vh;position: absolute;left: 4%;top: 0%;">
+                <div class="alarm">警报</div>
+                <img src="./img/closeone.png" class="closeone">
+                <div class="alarmContent">
+                    <div style="display: flex;">
+                        <img src="./img/source.png" class="partsImg">
+                        <div class="parTil">警报信息</div>
+                    </div>
+                    <div class="parts">
+                        <div class="pointLiness">
+                            <img src="./img/point.png" class="point">
+                            <div class="parTils">警报源：<span class="parCon" id="parCon1">浙江吉利控股集团有限公司整车装配车间97号</span></div>
+                        </div>
+                        <div class="pointLine">
+                            <img src="./img/point.png" class="point">
+                            <div class="parTils">警报级别：<span class="parCon" id="parCon2">2级警报</span></div>
+                        </div>
+                        <div class="pointLine">
+                            <img src="./img/point.png" class="point">
+                            <div class="parTils">警报类型：<span class="parCon">实时警报</span></div>
+                        </div>
+                    </div>
+                    <div style="display: flex;">
+                        <img src="./img/type.png" class="partsImg">
+                        <div class="parTil">警报详情</div>
+                    </div>
+                    <div class="parts">
+                        <div class="pointLine">
+                            <img src="./img/point.png" class="point">
+                            <div class="parTils">警报源类型：<span class="parCon" id="parCon4">未确认</span></div>
+                        </div>
+                        <div class="pointLine">
+                            <img src="./img/point.png" class="point">
+                            <div class="parTilss">原因：<span class="parCon5" id="parCon5">未恢复</span></div>
+                        </div>
+                    </div>
+                    <div style="display: flex;">
+                        <img src="./img/altime.png" class="partsImg">
+                        <div class="parTil">警报时间</div>
+                    </div>
+                    <div class="part">
+                        <div class="pointLines">
+                            <img src="./img/point.png" class="point">
+                            <div class="parTils">警报发生时间：<span class="parCon" id="parCon3">2024-09-18 17:40:13.039</span></div>
+                        </div>
+                        <div class="pointLines">
+                            <img src="./img/point.png" class="point">
+                            <div class="parTils">警报确认时间：<span class="parCon">暂未确认</span></div>
+                        </div>
+                        <div class="pointLines">
+                            <img src="./img/point.png" class="point">
+                            <div class="parTils">警报恢复时间：<span class="parCon">暂未恢复</span></div>
+                            <div class="parsure">手动恢复</div>
+                        </div>
+                    </div>
+                </div>
+                <img src="./img/alarm.png" class="alarmImg">
+                <!-- 暂无警报 -->
+                <!-- <div class="noneContent" >
+                    <img src="./img/none.png" class="imgNone">
+                    <div class="noneTitle">今日暂无要处理警报</div>
+                </div>
+                <img src="./img/alarm.png"  class="alarmImgs"> -->
+                <div class="loader-2"></div>
+                <div class="loading">警报正在处理中...</div>
+                <div class="bjBottom"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        window._AMapSecurityConfig = {
+          securityJsCode: "c4e739df5bfa9d4c02bcd7fdf4fe20db",
+        };
+    </script>
+    <script src="https://webapi.amap.com/loader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="./utils/request.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.2/dist/echarts.min.js"></script>
+    <script src="./form-serialize/form-resialize.js"></script>
+    <script src="./js/index.js"></script>
+    <script src="./utils/auth.js"></script>
+</body>
+
+</html>

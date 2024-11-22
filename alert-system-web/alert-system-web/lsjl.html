@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>历史记录</title>
+    <!-- <link href="https://unpkg.com/@wangeditor/editor@latest/dist/css/style.css" rel="stylesheet"> -->
+    <link rel="stylesheet" href="css/lsjl.css">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="bg">
+        <!-- 时间和登录 -->
+        <div class="time"></div>
+        <!-- 工业报警 -->
+        <div class="title">
+            <div style="font-size:2.5rem;color: #3af0f8;  ">工业报警系统</div>
+        </div>
+        <!-- 用户相关 -->
+        <div class="user">
+            <img class="userImg1" src="img/user.png"><a class="u" href="#">当前用户：admin</a>
+            <span class="us">&ensp;|&ensp;</span>
+            <img class="userImg2" src="img/out.png"><a class="exit" href="#">退出登录</a>
+        </div>
+
+
+        <!-- 三个框 -->
+        <div style="margin-top: 2.85%;padding-left: 1.5%;display: flex;">
+            <!-- 设备监测数据分析 -->
+            <div>
+                <div class="tj">
+                    <div style="position: relative;">
+                        <img src="./img/sTitle.png" class="sTiltleImg">
+                        <div class="sTiltle">处理分析</div>
+                    </div>
+                    <div class="constrastTitle">实时警报处理及时度（是否当天确认恢复）</div>
+                    <div class="contrast"></div>
+                    <div class="tjBottom"></div>
+                </div>
+                <div class="tjbot">
+                </div>
+            </div>
+            <!-- 中间 -->
+            <div>
+                <div class="lsjl">
+                    <img src="./img/sTitle.png"
+                        style="width: 60vh;height: 11.5vh;position: absolute;left: 23%;top: -0.5%;">
+                    <div class="sTiltle1">全部记录</div>
+                    <div style="margin-top: 3.5vh; color: #3af0f8;padding-left: 1.5%;">
+                        <form class="form-select">
+                            <div class="optiontop">
+                                <div class="opbody">
+                                    <div class="optitless">排序：</div>
+                                    <select class="s2" id="s2" name="orderRule">
+                                        <option value="false">倒序</option>
+                                        <option value="true">正序</option>
+                                    </select>
+                                </div>
+                                <div class="opbody">
+                                    <div class="optitlesss">确认：</div>
+                                    <select class="s2" id="s1" name="confirmStatus">
+                                        <option value=null>全部</option>
+                                        <option value=true>已确认</option>
+                                        <option value=false>未确认</option>
+                                    </select>
+                                </div>
+                                <div class="opbody">
+                                    <div class="optitles">恢复：</div>
+                                    <select class="s2" id="s3" name="recoverStatus">
+                                        <option value=null>全部</option>
+                                        <option value=true>已恢复</option>
+                                        <option value=fasle>未恢复</option>
+                                    </select>
+                                </div>
+                                <div class="opbody">
+                                    <div class="optitless">级别：</div>
+                                    <select class="s2" id="s4" name="level">
+                                        <option value=null>全部</option>
+                                        <option value=1>1级</option>
+                                        <option value=2>2级</option>
+                                        <option value=3>3级</option>
+                                        <option value=4>4级</option>
+                                        <option value=5>5级</option>
+                                    </select>
+                                </div>
+                                <div class="opbody">
+                                    <div class="optitle">警报源类型：</div>
+                                    <select class="s2" id="s5" name="type">
+                                        <option value=null>全部</option>
+                                        <option value="电源电压不稳定">电源电压不稳定</option>
+                                        <option value="压力异常">压力异常</option>
+                                        <option value="湿度过高">湿度过高</option>
+                                        <option value="温度过高">温度过高</option>
+                                        <option value="设备故障">设备故障</option>
+                                    </select>
+                                </div>
+                                <select style="display: none;" name="pageNum">
+                                    <option value=1>全部</option>
+                                </select>
+                                <select style="display: none;" name="pageSize">
+                                    <option value=30>全部</option>
+                                </select>
+                            </div>
+                        </form>
+                        <div class="inputbody">
+                            <div class="opbody">
+                                <div class="optitls">发生时间：</div>
+                                <div class="boxtime">
+                                    <div class="date-box">
+                                        <input type="text" placeholder="请输入日期" class="date-input" />
+                                        <div class="date">
+                                          <div class="date-header">
+                                            <div class="pre-date"><<</div>
+                                            <div class="show-year-month"></div>
+                                            <div class="next-date">>></div>
+                                          </div>
+                                          <table class="date-table">
+                                            <thead>
+                                              <tr>
+                                                <th>一</th>
+                                                <th>二</th>
+                                                <th>三</th>
+                                                <th>四</th>
+                                                <th>五</th>
+                                                <th>六</th>
+                                                <th>日</th>
+                                              </tr>
+                                            </thead>
+                                            <tbody class="date-tbody"></tbody>
+                                          </table>
+                                        </div>
+                                      </div>
+                                </div>
+                            </div>
+                            <div class="opbody">
+                                <div class="optitl">搜索：</div>
+                                <input placeholder="请输入需要搜索的关键字" class="b2">
+                            </div>
+                            <img src="./img/搜索框.png" class="rightsearch">
+                    <div class="rightinput">
+                        <form class="expandform">
+                            <div class="expand">
+                                <div class="expandpart">
+                                    <div class="expandtitle">警报源：</div>
+                                    <div class="expandinput">
+                                        <input type="text" placeholder="请在此输入警报源" id="expin1" name="source"> 
+                                    </div>
+                                </div>
+                                <div class="expandpart">
+                                    <div class="expandtitle">警报发生时间：</div>
+                                    <div class="expandinput">
+                                        <input type="text" placeholder="请在此输入警报发生时间" id="expin2" name="occur_time">
+                                    </div>
+                                </div>
+                                <img src="./img/makesure.png" class="expandsure" >
+                            </div>
+                        </form>
+                        <div class="line"></div>
+                        <p class="expandp">
+                            暂无数据哦
+                        </p>
+                    </div>
+                        </div>
+                    </div>
+
+                    <div class="tit">
+                        <div class="state">
+                            <span style="margin-left: 3vh;">记录</span>
+                            <span style="margin-left: 10.5vh;">报警源</span>
+                            <span style="margin-left: 13vh;">警报类型</span>
+                            <span style="margin-left: 8.5vh;">发生时间</span>
+                            <span style="margin-left: 9.5vh;">状态</span>
+                            <span style="margin-left: 7.2vh;">级别</span>
+                            <span style="margin-left: 6.8vh;">操作</span>
+                        </div>
+                    </div>
+                    <div class="allspancontent">
+
+                        <ul>
+
+                        </ul>
+                    </div>
+                    <div class="center">
+                        <ul class="pagination">
+                        </ul>
+                        <div class="xj">共100条</div>
+                    </div>
+                    <div class="lsjlBottom"></div>
+                </div>
+            </div>
+        </div>
+        <div class="pops">
+            <div class="popContent">
+                <div class="popsname">修改</div>
+                <img src="./img/undateclose.png" class="updateclose">
+                <form >
+                    <div class="popspart">
+                        <div class="popsparts">
+                            <div>警报：</div>
+                            <input type="text" placeholder="记录" id="con1">
+                        </div>
+                        <div class="popsparts">
+                            <div>警报源：</div>
+                            <input type="text" placeholder="警报源" id="con2">
+                        </div>
+                    </div>
+                    <div class="popspart1">
+                        <div class="popsparts1">
+                            <div>警报类型：</div>
+                            <input type="text" placeholder="警报类型" id="con3">
+                        </div>
+                        <div class="popsparts">
+                            <div>级别：</div>
+                            <input type="text" placeholder="级别" id="con4">
+                        </div>
+                    </div>
+                    <div class="popspart1">
+                        <div class="popsparts1">
+                            <div>警报状态：</div>
+                            <input type="text" placeholder="状态" id="con5">
+                        </div>
+                    </div>
+                    <div class="contenttime">时间</div>
+                    <div class="poptime">
+                        <div class="poptimepart">
+                            <div class="timepopname" >警报发生时间：</div>
+                            <input type="text" placeholder="发生时间" id="con6">
+                        </div>
+                        <div class="poptimeparts">
+                            <div class="timepopname">警报确认时间：</div>
+                            <input type="text" placeholder="确认时间" id="con7">
+                        </div>
+                    </div>
+                    <div class="poptimepart" style="margin-top: 1.5vh;">
+                        <div class="timepopname">警报恢复时间：</div>
+                        <input type="text" placeholder="恢复时间" id="con8">
+                    </div>
+                    <div class="editorbutton" style="margin-top: 3.5vh;">修改</div>
+                </form>
+            </div>
+        </div>
+        <div class="sucess">修改成功</div>
+        <div class="buttonimg">
+            <div class="returnimg" id="questionbut">
+                <img src="img/question.png" style="width: 4vh;">
+                <div class="return">问题反馈</div>
+            </div>
+            <div class="returnimg" id="gpt">
+                <img src="img/answer.png" style="width: 4vh;">
+                <div class="return">智能问答</div>
+            </div>
+            <div class="returnimg" id="setup">
+                <img src="img/version.png" style="width: 4.5vh;">
+                <div class="return">版本</div>
+            </div>
+            <a href="index.html">
+                <div class="returnimg">
+                    <img src="img/return.png" style="width: 4vh;">
+                    <div class="return">返回</div>
+                </div>
+            </a>
+        </div>
+
+        <div class="gpt">
+            <div class="gptT">
+                <img src="./img/customerService.png" class="gptimg">
+                <div>
+                    <p class="gptTitle">智能机器人小A</p>
+                    <p class="rg">人工客服热线 18857464736</p>
+                </div>
+            </div>
+            <div class="gptline"></div>
+            <div class="gptbd">
+                <p class="gpttips">欢迎使用智能问答,有问题可以告诉小A哦~</p>
+                <div class="gptproblem">
+                    <p class="gptpr0blemtitle">常见问题</p>
+                    <div class="problem" id="pro1">如何联系人工客服？</div>
+                    <div class="problem" id="pro2">最近十条实时警报在哪展示？</div>
+                    <div class="problem" id="pro3">什么是工业报警系统？</div>
+                    <div class="problem" id="pro4">如何进行实时警报处理？</div>
+                    <div class="problem" id="pro5">如何进行历史警报修改？</div>
+                </div>
+                <div class="questionBody">
+                    <!-- <div class="question">
+                        <img src="./img/gpticon.png" class="gpticon" >
+                        <div class="gptQuestion">最近十条实时警报在哪展示？</div>
+                    </div> -->
+                    <div class="gptanswer">
+                        <img src="./img/ai.png" class="answerai">
+                        <div class="answer">请告诉我您遇到了什么问题？</div>
+                    </div>
+                </div>
+               
+                <div class="gptbottom">
+                    <input class="db" type="text" placeholder="请输入问题" >
+                    <input type="button" value="发送" class="fs" onclick="clearF()">
+                </div>
+
+            </div>
+            <div class="kailongss"></div>
+        </div>
+
+        <div class="Pop-ups">
+            <div class="editorname">问题反馈</div>
+            <textarea name="content" class="inputtext" placeholder="在此处输入您想提出的问题吧，我们会尽快为您解决的..."></textarea>
+            <div class="editorbuttons">发送</div>
+        </div>
+        <div class="kailong"></div>
+        <div class="sucesses">反馈成功</div>
+        <div class="setup">
+            <div class="setupname">版本</div>
+           <div style="display: flex;">
+                <div class="version">当前为最新版本，还不需要更新哦</div>
+                <img src="./img/renew.png" class="renew">
+           </div>
+           <div class="bug">
+                <div>24/7/25 修复一些细节</div>
+                <div>24/7/30 页面美化设计</div>
+                <div>24/8/12 增加智能问答模块，便于使用</div>
+                <div>24/8/15 修复一些细节</div>
+                <div>24/8/28 修复在某些情况下加载标签资源出错的bug</div>
+           </div>
+        </div>
+        <div class="kailongs"></div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- <script src="https://unpkg.com/@wangeditor/editor@latest/dist/index.js"></script> -->
+    <script src="./utils/request.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.2/dist/echarts.min.js"></script>
+    <script src="./form-serialize/form-resialize.js"></script>
+    <!-- <script src="./utils/editor.js"></script> -->
+    <script src="./js/lsjl.js"></script>
+    <script src="./utils/auth.js"></script>
+</body>
+
+</html>

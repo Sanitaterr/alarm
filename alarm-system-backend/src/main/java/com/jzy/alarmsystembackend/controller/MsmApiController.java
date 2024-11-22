@@ -30,9 +30,12 @@ public class MsmApiController {
 
     @GetMapping(value = "/send/{phone}")
     public AjaxResult code(@PathVariable String phone) {
-        String code = "666666";
         Map<String,Object> param = new HashMap<>();
-        param.put("code", code);
+        param.put("unit_name", "泊森");
+        param.put("address", "一号仓库");
+        param.put("time", "2024-11-02 12:59:57.343");
+        param.put("value", 1);
+        param.put("value1", 2);
 
         return AjaxResult.successProjectInfoData(
                 "send success",

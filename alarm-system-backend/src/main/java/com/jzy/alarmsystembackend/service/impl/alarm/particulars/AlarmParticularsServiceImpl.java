@@ -4,9 +4,14 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.jzy.alarmsystembackend.annotations.Loggable;
 import com.jzy.alarmsystembackend.mapper.alarm.AlarmParticularsMapper;
 import com.jzy.alarmsystembackend.pojo.DO.alarm.AlarmParticulars;
+import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO13;
+import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO8;
+import com.jzy.alarmsystembackend.util.RedisCache;
 import com.jzy.alarmsystembackend.util.TimeEnum;
 import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO1;
 import com.jzy.alarmsystembackend.service.alarm.particulars.AlarmParticularsService;
@@ -14,6 +19,7 @@ import com.jzy.alarmsystembackend.service.impl.log.AlarmUpdateLogServiceImpl;
 import com.jzy.alarmsystembackend.service.user.InfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -33,6 +39,9 @@ public class AlarmParticularsServiceImpl implements AlarmParticularsService {
     @Autowired
     private InfoService infoService;
 
+    @Autowired
+    private RedisCache redisCache;
+
     /**
      * 查询所有报警信息
      *
@@ -46,7 +55,6 @@ public class AlarmParticularsServiceImpl implements AlarmParticularsService {
 
     /**
      * 查询所有报警信息
-     * <img src='https://profile-avatar.csdnimg.cn/1dd662a7799a42f0a187eb69e74d73a3_weixin_52971316.jpg!1'>
      * By firmId
      *
      * @return List<Alarm>
@@ -57,6 +65,11 @@ public class AlarmParticularsServiceImpl implements AlarmParticularsService {
         return firmId == -1 ? alarmParticularsMapper.selectList(null) : alarmParticularsMapper.selectAlarmParticularsAuth(firmId);
 
     }
+
+    private final Cache<String, IPage<AlarmParticulars>> localCache = Caffeine.newBuilder()
+            .expireAfterWrite(5, TimeUnit.MINUTES)
+            .maximumSize(100)
+            .build();
 
     /**
      * 查询所有报警信息
@@ -69,7 +82,69 @@ public class AlarmParticularsServiceImpl implements AlarmParticularsService {
     public IPage<AlarmParticulars> selectAllAlarmPagedAuth(Long pageNum, Long pageSize) {
         Integer firmId = infoService.getInfo().getFirmId();
         Page<AlarmParticulars> page = new Page<>(pageNum, pageSize);
-        return firmId == -1 ? alarmParticularsMapper.selectPage(page, null) : alarmParticularsMapper.selectAlarmParticularsAuth(page, firmId);
+
+        String cacheKey = "alarms:page:" + pageNum + ":size:" + pageSize + ":firm:" + firmId;
+
+        IPage<AlarmParticulars> cachedPage = redisCache.getCacheObject(cacheKey);
+        if (cachedPage != null) {
+            return cachedPage;
+        }
+
+        IPage<AlarmParticulars> resultPage = firmId == -1
+                ? alarmParticularsMapper.selectPage(page, null)
+                : alarmParticularsMapper.selectAlarmParticularsAuth(page, firmId);
+
+        redisCache.setCacheObject(cacheKey, resultPage);
+        return resultPage;
+
+//        -------------------
+
+//        Integer firmId = infoService.getInfo().getFirmId();
+//        String cacheKey = "alarms:page:" + pageNum + ":size:" + pageSize + ":firm:" + firmId;
+//
+//        // 先从本地缓存查询
+//        IPage<AlarmParticulars> cachedPage = localCache.getIfPresent(cacheKey);
+//        if (cachedPage != null) {
+//            return cachedPage;
+//        }
+//
+//        // 再从 Redis 查询
+//        cachedPage = redisCache.getCacheObject(cacheKey);
+//        if (cachedPage != null) {
+//            localCache.put(cacheKey, cachedPage); // 更新本地缓存
+//            return cachedPage;
+//        }
+//
+//        // 使用分布式锁避免缓存击穿
+//        String lockKey = "lock:" + cacheKey;
+//        boolean lock = redisCache.tryLock(lockKey, 10, TimeUnit.SECONDS);
+//        if (lock) {
+//            try {
+//                // 双重检查：获取锁后再查询一次 Redis，防止其他线程已缓存
+//                cachedPage = redisCache.getCacheObject(cacheKey);
+//                if (cachedPage == null) {
+//                    // 缓存未命中，查询数据库
+//                    Page<AlarmParticulars> page = new Page<>(pageNum, pageSize);
+//                    cachedPage = firmId == -1
+//                            ? alarmParticularsMapper.selectPage(page, null)
+//                            : alarmParticularsMapper.selectAlarmParticularsAuth(page, firmId);
+//
+//                    // 写入 Redis 和本地缓存
+//                    redisCache.setCacheObject(cacheKey, cachedPage, 5, TimeUnit.MINUTES);
+//                    localCache.put(cacheKey, cachedPage);
+//                }
+//            } finally {
+//                // 释放锁
+//                redisCache.unlock(lockKey);
+//            }
+//        } else {
+//            // 未获取到锁的线程等待其他线程缓存完成，减少数据库访问
+//            cachedPage = redisCache.getCacheObject(cacheKey);
+//            if (cachedPage == null) {
+//                throw new RuntimeException("Please try again later.");
+//            }
+//        }
+//        return cachedPage;
     }
 
     /**
@@ -562,5 +637,96 @@ public class AlarmParticularsServiceImpl implements AlarmParticularsService {
         LambdaQueryWrapper<AlarmParticulars> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.orderByDesc(AlarmParticulars::getOccurTime).last("LIMIT 1");
         return alarmParticularsMapper.selectOne(lambdaQueryWrapper);
+    }
+
+    /**
+     * 多条件查找
+     * @param param AlarmParticularsParamVO8
+     * @return java.util.List<com.jzy.alarmsystembackend.pojo.DO.alarm.AlarmParticulars>
+     * @author jzy
+     * @create 2024/10/9
+     **/
+    @Override
+    public List<AlarmParticulars> selectCondition(AlarmParticularsParamVO8 param) {
+        LambdaQueryWrapper<AlarmParticulars> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        if (infoService.getInfo().getFirmId() != -1) {
+            lambdaQueryWrapper
+                    .apply("firm_id = {0}", infoService.getInfo().getFirmId());
+        }
+        if (param.getLevel() != null) {
+            lambdaQueryWrapper.eq(AlarmParticulars::getLevel, param.getLevel());
+        }
+
+        if (param.getType() != null) {
+            lambdaQueryWrapper.eq(AlarmParticulars::getType, param.getType());
+        }
+
+        if (param.getStartTime() != null && param.getEndTime() != null) {
+            lambdaQueryWrapper.ge(AlarmParticulars::getOccurTime, param.getStartTime())
+                    .le(AlarmParticulars::getOccurTime, param.getEndTime());
+        } else if (param.getStartTime() != null) {
+            lambdaQueryWrapper.ge(AlarmParticulars::getOccurTime, param.getStartTime());
+        } else if (param.getEndTime() != null) {
+            lambdaQueryWrapper.le(AlarmParticulars::getOccurTime, param.getEndTime());
+        }
+
+        if (param.getConfirmStatus() != null) {
+            lambdaQueryWrapper.eq(AlarmParticulars::getConfirmStatus, param.getConfirmStatus());
+        }
+        if (param.getRecoverStatus() != null) {
+            lambdaQueryWrapper.eq(AlarmParticulars::getRecoverStatus, param.getRecoverStatus());
+        }
+        if (param.getOrderRule() != null) {
+            if (param.getOrderRule()) {
+                lambdaQueryWrapper.orderByAsc(AlarmParticulars::getOccurTime);
+            } else {
+                lambdaQueryWrapper.orderByDesc(AlarmParticulars::getOccurTime);
+            }
+        }
+
+        return alarmParticularsMapper.selectAlarmParticularsByWrapperAuth(lambdaQueryWrapper);
+    }
+
+    @Override
+    public IPage<AlarmParticulars> selectConditionPaged(AlarmParticularsParamVO13 param) {
+        LambdaQueryWrapper<AlarmParticulars> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        log.error("wwwww" + infoService.getInfo().getFirmId());
+        if (infoService.getInfo().getFirmId() != -1) {
+            lambdaQueryWrapper
+                    .apply("firm_id = {0}", infoService.getInfo().getFirmId());
+        }
+        if (param.getLevel() != null) {
+            lambdaQueryWrapper.eq(AlarmParticulars::getLevel, param.getLevel());
+        }
+
+        if (param.getType() != null) {
+            lambdaQueryWrapper.eq(AlarmParticulars::getType, param.getType());
+        }
+
+        if (param.getStartTime() != null && param.getEndTime() != null) {
+            lambdaQueryWrapper.ge(AlarmParticulars::getOccurTime, param.getStartTime())
+                    .le(AlarmParticulars::getOccurTime, param.getEndTime());
+        } else if (param.getStartTime() != null) {
+            lambdaQueryWrapper.ge(AlarmParticulars::getOccurTime, param.getStartTime());
+        } else if (param.getEndTime() != null) {
+            lambdaQueryWrapper.le(AlarmParticulars::getOccurTime, param.getEndTime());
+        }
+
+        if (param.getConfirmStatus() != null) {
+            lambdaQueryWrapper.eq(AlarmParticulars::getConfirmStatus, param.getConfirmStatus());
+        }
+        if (param.getRecoverStatus() != null) {
+            lambdaQueryWrapper.eq(AlarmParticulars::getRecoverStatus, param.getRecoverStatus());
+        }
+        if (param.getOrderRule() != null) {
+            if (param.getOrderRule()) {
+                lambdaQueryWrapper.orderByAsc(AlarmParticulars::getOccurTime);
+            } else {
+                lambdaQueryWrapper.orderByDesc(AlarmParticulars::getOccurTime);
+            }
+        }
+
+
+        return alarmParticularsMapper.selectAlarmParticularsByWrapperPagedAuth(new Page<>(Long.parseLong(param.getPageNum()), Long.parseLong(param.getPageSize())), lambdaQueryWrapper);
     }
 }

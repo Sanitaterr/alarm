@@ -9,7 +9,10 @@ import com.jzy.alarmsystembackend.mapper.log.AlarmUpdateLogMapper;
 import com.jzy.alarmsystembackend.pojo.DO.User;
 import com.jzy.alarmsystembackend.pojo.DO.alarm.AlarmParticulars;
 import com.jzy.alarmsystembackend.pojo.DO.log.AlarmUpdateLog;
+import com.jzy.alarmsystembackend.pojo.DO.log.LoginLog;
 import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO1;
+import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO10;
+import com.jzy.alarmsystembackend.pojo.VO.alarm.particulars.AlarmParticularsParamVO12;
 import com.jzy.alarmsystembackend.service.log.AlarmUpdateLogService;
 import com.jzy.alarmsystembackend.service.log.MyLog;
 import com.jzy.alarmsystembackend.service.user.InfoService;
@@ -33,6 +36,12 @@ public class AlarmUpdateLogServiceImpl implements AlarmUpdateLogService, MyLog {
     @Autowired
     private InfoService infoService;
 
+    /**
+     * 查询所有日志
+     * @return java.util.List<com.jzy.alarmsystembackend.pojo.DO.log.AlarmUpdateLog>
+     * @author jzy
+     * @create 2024/10/9
+     **/
     @Override
     public List<AlarmUpdateLog> getAllLogAuth() {
         LambdaQueryWrapper<AlarmUpdateLog> lambdaQueryWrapper = new LambdaQueryWrapper<>();
@@ -48,6 +57,51 @@ public class AlarmUpdateLogServiceImpl implements AlarmUpdateLogService, MyLog {
         lambdaQueryWrapper
                 .eq(AlarmUpdateLog::getFirm, infoService.getInfo().getFirmId());
         return alarmUpdateLogMapper.selectPage(new Page<>(pageNum, pageSize), wrapper);
+    }
+
+    @Override
+    public List<AlarmUpdateLog> selectCondition(AlarmParticularsParamVO10 param) {
+        LambdaQueryWrapper<AlarmUpdateLog> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+
+        if (param.getUsername() != null) {
+            lambdaQueryWrapper.eq(AlarmUpdateLog::getUsername, param.getUsername());
+        }
+
+        if (param.getType() != null) {
+            lambdaQueryWrapper.eq(AlarmUpdateLog::getType, param.getType());
+        }
+
+        if (param.getStartTime() != null) {
+            lambdaQueryWrapper.ge(AlarmUpdateLog::getTime, param.getStartTime());
+        }
+        if (param.getEndTime() != null) {
+            lambdaQueryWrapper.le(AlarmUpdateLog::getTime, param.getEndTime());
+        }
+
+        return alarmUpdateLogMapper.selectList(lambdaQueryWrapper);
+    }
+
+    @Override
+    public IPage<AlarmUpdateLog> selectConditionPaged(AlarmParticularsParamVO12 param) {
+        LambdaQueryWrapper<AlarmUpdateLog> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+
+        if (param.getUsername() != null) {
+            lambdaQueryWrapper.eq(AlarmUpdateLog::getUsername, param.getUsername());
+        }
+
+        if (param.getType() != null) {
+            lambdaQueryWrapper.eq(AlarmUpdateLog::getType, param.getType());
+        }
+
+        if (param.getStartTime() != null) {
+            lambdaQueryWrapper.ge(AlarmUpdateLog::getTime, param.getStartTime());
+        }
+        if (param.getEndTime() != null) {
+            lambdaQueryWrapper.le(AlarmUpdateLog::getTime, param.getEndTime());
+        }
+
+        Page<AlarmUpdateLog> page = new Page<>(param.getPageNum(), param.getPageSize());
+        return alarmUpdateLogMapper.selectPage(page, lambdaQueryWrapper);
     }
 
     @Override
